@@ -123,7 +123,7 @@ class Sample:
                         is_mem = True
                         break
                 if is_mem:
-                    self._find_users(i, line, src, debug)
+                    self.find_def_use(i, line, src, debug)
 
         logger.info('stall count analysis: ')
         remove = []
@@ -143,7 +143,7 @@ class Sample:
         self.dims = len(self.candidates)
         return self.dims, kernel_lineno_cnt, mem_loc, max_src_len
 
-    def _find_users(self, idx, line, src, debug):
+    def find_def_use(self, idx, line, src, debug):
         for src_loc in src:
             if src_loc.startswith('UR'):
                 # XXX can always skip uniform register?
@@ -183,7 +183,7 @@ class Sample:
 
                 j += 1
                 if j >= 50:
-                    logger.warning(f'cannot resolve stall count {line}')
+                    logger.warning(f'cannot resolve stall count {line} for {src_loc}')
                     break
                     # raise RuntimeError(f'cannot reolve stall count {line}')
 
