@@ -52,6 +52,8 @@ pip install pyelftools
 pip install tensorboard
 
 
+CUDA Driver Version: 545.23.08
+ptxas --version: 12.2
 
 
 https://github.com/hgl71964/CuAssembler.git

@@ -212,11 +212,23 @@ def check_adj_opcodes(
             if set(prev_src).intersection(cur_src):
                 return False
 
+        # from rbe
+        # if prev_opcode.startswith('LDG.E.U16') and cur_opcode.startswith('PRMT'):
+        #     return False
+
+        # flash decoding
+        # if prev_opcode.startswith('CS2R') and cur_opcode.startswith('LDG.E.128'):
+        #     return False
+        # if prev_opcode.startswith('PRMT') and cur_opcode.startswith('LDG.E.U16'):
+        #     return False
+
         # from conv
         # if prev_opcode.startswith('LDG') and cur_opcode.startswith('CS2R'):
         #     return False
         # from int4
-        # elif prev_opcode.startswith('LDG') and cur_opcode.startswith('IMAD.X'):
+        # if prev_opcode.startswith('LDG') and cur_opcode.startswith('IMAD.X'):
+        #     return False
+        # if prev_opcode.startswith('LDG.E') and cur_opcode.startswith('LDG.E'):
         #     return False
 
         # predicate dependencies
