@@ -3,14 +3,16 @@ from copy import deepcopy
 
 import numpy as np
 
-from cuasmrl.utils.gpu_utils import get_gpu_cc, get_mutatable_ops, get_min_stall_count, get_st_window, check_adj_opcodes
+from cuasmrl.utils.gpu_utils import get_gpu_cc, get_mutatable_ops, get_min_stall_count, get_st_window, check_adj_opcodes, get_st_database
 from cuasmrl.utils.logger import get_logger
 
 CC = get_gpu_cc()
 MEMORY_OPS, BAN_OPS = get_mutatable_ops(CC)
 MEMORY_OPS_INDEX = {op: i for i, op in enumerate(MEMORY_OPS)}
 ST_WINDOW = get_st_window(CC)
-MIN_ST_ANALYSIS = {}
+
+# MIN_ST_ANALYSIS = {}
+MIN_ST_ANALYSIS = get_st_database(CC)
 
 logger = get_logger(__name__)
 
@@ -183,7 +185,8 @@ class Sample:
 
                 j += 1
                 if j >= 50:
-                    logger.warning(f'cannot resolve stall count {line} for {src_loc}')
+                    logger.warning(
+                        f'cannot resolve stall count {line} for {src_loc}')
                     break
                     # raise RuntimeError(f'cannot reolve stall count {line}')
 

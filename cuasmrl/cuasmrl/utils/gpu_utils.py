@@ -77,6 +77,17 @@ def get_mutatable_ops(cc):
         raise RuntimeError(f'unsupported compute capability: {cc}')
 
 
+def get_st_database(cc):
+    if cc == (8, 0):
+        return {
+            'IADD3': 9,
+            'IADD3.X': 5,
+            'IMAD.WIDE': 5,
+        }
+    else:
+        raise RuntimeError(f'unsupported compute capability: {cc}')
+
+
 def has_hazard(cc, st, opcode, dst, src, tmp_opcode, tmp_dst, tmp_src):
     if cc == (7, 0):
         # st
