@@ -206,7 +206,7 @@ if __name__ == '__main__':
     if drl_config.load is None:
         load_dir = None
     elif drl_config.load == "auto":
-        load_dir = f'data/{GPU}/rmsnorm/{batch}_{heads}_{seq_len}_{dim}'
+        load_dir = f'{drl_config.default_out_path}/{GPU}/rmsnorm/{batch}_{heads}_{seq_len}_{dim}'
     else:
         load_dir = drl_config.load
 

@@ -178,7 +178,7 @@ def main():
         drl_config=config,
     )
     @jit
-    def matmul_kernel(
+    def cuasmrl_kernel(
             # Pointers to matrices
             a_ptr, b_ptr, c_ptr,
             # Matrix dimensions
@@ -372,11 +372,11 @@ def main():
     if config.load is None:
         load_dir = None
     elif config.load == "auto":
-        load_dir = f'data/{GPU}/mm_leakyRelu/{M}_{N}_{K}'
+        load_dir = f'{config.default_out_path}/{GPU}/mm_leakyRelu/{M}_{N}_{K}'
     else:
         load_dir = config.load
     grid = lambda META: (triton.cdiv(M, META['BLOCK_SIZE_M']) * triton.cdiv(N, META['BLOCK_SIZE_N']), )
-    sip_out = matmul(a, b, c, matmul_kernel, M, N, K, grid, load_dir, "leaky_relu")
+    sip_out = matmul(a, b, c, cuasmrl_kernel, M, N, K, grid, load_dir, "leaky_relu")
     triton_output = tt_matmul(a, b, c_ref, M, N, K, grid, "leaky_relu")
     torch_output = torch.nn.functional.leaky_relu(torch.matmul(a, b))
 
@@ -434,7 +434,7 @@ def main():
         if provider == 'cublas':
             ms = triton.testing.do_bench(lambda: torch.nn.functional.leaky_relu(torch.matmul(a, b)),warmup=100, rep=100,  quantiles=quantiles)
         if provider == 'fgk':
-            ms = triton.testing.do_bench(lambda: matmul(a, b, c, matmul_kernel, M, N, K, grid, load_dir, "leaky_relu"), warmup=100, rep=100, quantiles=quantiles)
+            ms = triton.testing.do_bench(lambda: matmul(a, b, c, cuasmrl_kernel, M, N, K, grid, load_dir, "leaky_relu"), warmup=100, rep=100, quantiles=quantiles)
         if provider == 'triton':
             ms = triton.testing.do_bench(lambda: tt_matmul(a, b, c, M, N, K, grid, "leaky_relu"), warmup=100, rep=100, quantiles=quantiles)
         perf = lambda ms: 2 * M * N * K * 1e-12 / (ms * 1e-3)

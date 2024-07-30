@@ -5,11 +5,12 @@ logger = get_logger(__name__)
 
 
 def static_analysis(
-    kernel_section,
-    engine,
-    ban_ops,
-    memory_ops,
-    min_st_analysis,
+        kernel_section,
+        engine,
+        ban_ops,
+        memory_ops,
+        min_st_analysis,  # out
+        black_list,  # out
 ):
     # pre-scan to obtain assembly file stats
     debug = False
@@ -68,7 +69,19 @@ def static_analysis(
                     is_mem = True
                     break
             if is_mem:
-                find_def_use(i, line, src, debug)
+                resolved = find_def_use(
+                    kernel_section,
+                    engine,
+                    min_st_analysis,
+                    i,
+                    line,
+                    src,
+                    debug,
+                )
+            # XXX a hack for blacklist
+            if is_mem and not resolved:
+                black_list.add(line)
+                candidates.pop(-1)
 
     logger.info('stall count analysis: ')
     remove = []
@@ -99,12 +112,16 @@ def find_def_use(
     debug,
 ):
 
-    all_resolved = False
+    resolved = False
 
     for src_loc in src:
         if src_loc.startswith('UR'):
             # XXX can always skip uniform register?
             continue
+
+        if src_loc.startswith('P'):
+            # TODO what about predicate register
+            pass
 
         j = 1
         accum = 0
@@ -117,7 +134,7 @@ def find_def_use(
                 logger.warning(f'reach a label before resolving users; {line}')
 
                 # FIXME should break? just skip?
-                all_resolved = False
+                # all_resolved = False
                 break
 
             *_, stall_count = engine.decode_ctrl_code(tmp_ctrl)
@@ -136,14 +153,17 @@ def find_def_use(
                     # logger.info(f'adding {line} with {accum}')
                     min_st_analysis[tmp_opcode] = accum
                 logger.info(f'resolve {tmp_opcode}')
+                resolved = True
                 break
 
             j += 1
             if j >= 50:
-                logger.warning(
-                    f'cannot resolve stall count {line} for {src_loc}')
-                all_resolved = False
+                # logger.warning(
+                #     f'cannot resolve stall count {line} for {src_loc}')
+                # all_resolved = False
                 break
                 # raise RuntimeError(f'cannot reolve stall count {line}')
+    if not resolved:
+        logger.warning(f'cannot resolve stall count {line} for {src}')
 
-    return all_resolved
+    return resolved

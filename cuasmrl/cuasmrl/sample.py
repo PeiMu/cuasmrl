@@ -5,6 +5,7 @@ import numpy as np
 
 from cuasmrl.utils.gpu_utils import get_gpu_cc, get_mutatable_ops, get_min_stall_count, get_st_window, check_adj_opcodes, get_st_database
 from cuasmrl.utils.logger import get_logger
+from cuasmrl.analysis.static_analysis import static_analysis
 
 CC = get_gpu_cc()
 MEMORY_OPS, BAN_OPS = get_mutatable_ops(CC)
@@ -13,6 +14,8 @@ ST_WINDOW = get_st_window(CC)
 
 # MIN_ST_ANALYSIS = {}
 MIN_ST_ANALYSIS = get_st_database(CC)
+
+BLACK_LIST = set()
 
 logger = get_logger(__name__)
 
@@ -69,126 +72,17 @@ class Sample:
             assert False, f'invalid action: {action}'
 
     def static_analysis(self) -> list[int]:
-        # pre-scan to obtain assembly file stats
-        debug = False
-        if os.getenv("SIP_DEBUG", "0") == "1":
-            debug = True
-
-        # determine which lines are possible to mutate
-        # e.g. LDG, STG, and they should not cross the boundary of a label or
-        # LDGDEPBAR or BAR.SYNC or rw dependencies
-        # lines = []
-        kernel_lineno_cnt = 0
-        mem_loc = {}
-        max_src_len = 0
-        for i, line in enumerate(self.kernel_section):
-            line = line.strip()
-            # skip headers
-            if len(line) > 0 and line[0] == '[':
-                out = self.engine.decode(line)
-                ctrl_code, _, predicate, opcode, dst, src = out
-                if ctrl_code is None:
-                    # a label
-                    continue
-
-                kernel_lineno_cnt += 1
-
-                # integeralize memory location
-                if dst not in mem_loc:
-                    mem_loc[dst] = len(mem_loc)
-                for s in src:
-                    if s not in mem_loc:
-                        mem_loc[s] = len(mem_loc)
-                max_src_len = max(max_src_len, len(src))
-
-                # determine if MemOp;
-                # opcode is like: LDG.E.128.SYS; i.e. {inst}.{modifier*}
-                ban = False
-                for op in BAN_OPS:
-                    # if op in opcode:
-                    if opcode.startswith(op):
-                        ban = True
-                        break
-                if ban:
-                    if debug:
-                        logger.warning(f'ban {ctrl_code} {opcode}')
-                    continue
-
-                is_mem = False
-                for op in MEMORY_OPS:
-                    # if op in opcode:
-                    if opcode.startswith(op):
-                        if debug:
-                            logger.info(f'mutable {ctrl_code} {opcode}')
-                        self.candidates.append(i)
-                        # lines.append(line)
-                        is_mem = True
-                        break
-                if is_mem:
-                    self.find_def_use(i, line, src, debug)
-
-        logger.info('stall count analysis: ')
-        remove = []
-        for k, v in MIN_ST_ANALYSIS.items():
-            if v > 20:
-                remove.append(k)
-                logger.warning(f'pruning {k} -> {v}')
-            elif k.startswith('LDS'):
-                remove.append(k)
-                logger.warning(f'pruning {k} -> {v}')
-            else:
-                logger.info(f'{k} -> {v}')
-        for k in remove:
-            MIN_ST_ANALYSIS.pop(k)
-
-        # dimension of the optimization problem
-        self.dims = len(self.candidates)
-        return self.dims, kernel_lineno_cnt, mem_loc, max_src_len
-
-    def find_def_use(self, idx, line, src, debug):
-        for src_loc in src:
-            if src_loc.startswith('UR'):
-                # XXX can always skip uniform register?
-                continue
-
-            j = 1
-            accum = 0
-            # print('line: ', line)
-            while True:
-                tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src = self.engine.decode(
-                    self.kernel_section[idx - j].strip())
-                if tmp_ctrl is None:
-                    # if it is a label, don't care stall count
-                    logger.warning(
-                        f'reach a label before resolving users; {line}')
-
-                    # FIXME should break? just skip?
-                    break
-
-                *_, stall_count = self.engine.decode_ctrl_code(tmp_ctrl)
-                stall_count = int(stall_count[1:-1])
-                accum += stall_count
-
-                # print(self.kernel_section[idx - j].strip())
-                # print(tmp_dst)
-
-                if src_loc == tmp_dst:
-                    if tmp_opcode in MIN_ST_ANALYSIS:
-                        # logger.info(f'updating {line} with {accum} and {MIN_ST_ANALYSIS[tmp_opcode]}')
-                        MIN_ST_ANALYSIS[tmp_opcode] = min(
-                            MIN_ST_ANALYSIS[tmp_opcode], accum)
-                    else:
-                        # logger.info(f'adding {line} with {accum}')
-                        MIN_ST_ANALYSIS[tmp_opcode] = accum
-                    logger.info(f'resolve {tmp_opcode}')
-                    break
-
-                j += 1
-                if j >= 50:
-                    logger.warning(
-                        f'cannot resolve stall count {line} for {src_loc}')
-                    break
-                    # raise RuntimeError(f'cannot reolve stall count {line}')
+        candidates, dims, kernel_lineno_cnt, mem_loc, max_src_len = static_analysis(
+            self.kernel_section,
+            self.engine,
+            BAN_OPS,
+            MEMORY_OPS,
+            MIN_ST_ANALYSIS,
+            BLACK_LIST,
+        )
+        self.candidates = candidates
+        self.dims = dims
+        return dims, kernel_lineno_cnt, mem_loc, max_src_len
 
     def embedding(self, space, mem_loc, max_src_len):
         self.candidates.clear()
@@ -217,7 +111,7 @@ class Sample:
                 cnt += 1
 
                 # only memory ops are considered mutable candidates
-                if op_embed[0] != -1:
+                if op_embed[0] != -1 and line not in BLACK_LIST:
                     self.candidates.append(lineno)
                     # TODO check bound of kernel_section?
                     mask = self._generate_mask(
