@@ -136,7 +136,6 @@ def matmul(a, b, c, kernel, M, N, K, grid, load, activation=""):
 
 
 def main():
-
     config = parse_args()
 
     random.seed(config.seed)
