@@ -80,11 +80,11 @@ def parse_args() -> Config:
     parser.add_argument('--bench', default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--tt', default=False, action=argparse.BooleanOptionalAction)
 
-    # 1_32_1024_128
+    # 1_32_1024_128, 1_32_4096_64
     parser.add_argument("--Z", type=int, dest="Z", default=1)
-    parser.add_argument("--H", type=int, dest="H", default=128)
-    parser.add_argument("--wl", type=int, default=128)
-    parser.add_argument("--dh", type=int, dest="D_HEAD", default=128)
+    parser.add_argument("--H", type=int, dest="H", default=32)
+    parser.add_argument("--wl", type=int, default=4096)
+    parser.add_argument("--dh", type=int, dest="D_HEAD", default=64)
 
     parser.add_argument("-t", "--train", type=int, dest="train", default=1)
     parser.add_argument("-l", "--log", type=int, dest="log", default=1)

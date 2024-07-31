@@ -74,7 +74,7 @@ def parse_args() -> Config:
     parser.add_argument("--seed", type=int, default=1337)
     parser.add_argument("--n_tests", type=int, default=2)
     parser.add_argument("--load", type=str)
-    parser.add_argument("--bench", type=int, default=0)
+    parser.add_argument('--bench', default=False, action=argparse.BooleanOptionalAction)
 
     parser.add_argument("--Z", type=int, dest="Z", default=1)
     parser.add_argument("--H", type=int, dest="H", default=4)
@@ -268,22 +268,39 @@ def main():
 
     @fgk_autotune(
         configs=[
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=2, num_warps=4),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=4, num_warps=8),
-            # # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 64}, num_stages=3, num_warps=8),
-            # # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 32}, num_stages=3, num_warps=8),
-            # # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 32}, num_stages=3, num_warps=4),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=3, num_warps=4),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=4, num_warps=4),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=3, num_warps=4),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=4, num_warps=4),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=3, num_warps=8),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=7, num_warps=8),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=7, num_warps=8),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=6, num_warps=8),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=5, num_warps=8),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=4, num_warps=8),
-            # triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=6, num_warps=4),
+            # tutorials:
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 64}, num_stages=4, num_warps=8),
+            # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 64}, num_stages=3, num_warps=8),
+            # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 32}, num_stages=3, num_warps=8),
+            # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 32}, num_stages=3, num_warps=4),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 32}, num_stages=3, num_warps=4),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 32}, num_stages=4, num_warps=4),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 64}, num_stages=3, num_warps=4),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 64}, num_stages=4, num_warps=4),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 64}, num_stages=3, num_warps=8),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 64}, num_stages=7, num_warps=8),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 32}, num_stages=7, num_warps=8),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 32}, num_stages=6, num_warps=8),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 32}, num_stages=5, num_warps=8),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 32}, num_stages=4, num_warps=8),
+            # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 64}, num_stages=6, num_warps=4),
+
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=2, num_warps=4),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=4, num_warps=8),
+            # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 64}, num_stages=3, num_warps=8),
+            # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 32}, num_stages=3, num_warps=8),
+            # triton.Config({'BLOCK_M': 256, 'BLOCK_N': 32}, num_stages=3, num_warps=4),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=3, num_warps=4),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=4, num_warps=4),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=3, num_warps=4),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=4, num_warps=4),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=3, num_warps=8),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=7, num_warps=8),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=7, num_warps=8),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=6, num_warps=8),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=5, num_warps=8),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 32 }, num_stages=4, num_warps=8),
+            triton.Config({ 'BLOCK_M': 128, 'BLOCK_N': 64 }, num_stages=6, num_warps=4),
 
             triton.Config({ 'BLOCK_M': 64, 'BLOCK_N': 32 }, num_stages=2, num_warps=2),
         ],
@@ -555,7 +572,7 @@ def main():
     if config.load is None:
         load_dir = None
     elif config.load == "auto":
-        load_dir = f'data/{GPU}/flash_attn/{config.Z}_{config.H}_{config.wl}_{config.D_HEAD}_{causal}'
+        load_dir = f'{config.default_out_path}/{GPU}/flash_attn/{config.Z}_{config.H}_{config.wl}_{config.D_HEAD}_{causal}'
     else:
         load_dir = config.load
     fgk_out = attn_forward(q, k, v, M, o, grid, causal, sm_scale, _attn_fwd, load_dir)
@@ -565,7 +582,7 @@ def main():
     assert torch.allclose(tri_out, fgk_out, atol=1e-2, rtol=0)
     print('TEST PASSED')
 
-    if not bool(config.bench):
+    if not config.bench:
         print('SKIP bench...')
         return
 
@@ -716,14 +733,14 @@ def main():
         return total_flops / ms * 1e-9
 
     df = bench_flash_attention.run(print_data=True, return_df=True)
-    if isinstance(df, list):
-        assert len(df) == 1, f'expected 1 row, got {len(df)}'
-        df = df[0]
-    fp = f"data/{GPU}/results/flash_attn/{config.Z}_{config.H}_{config.wl}_{config.D_HEAD}_{config.causal}_{config.seed}.pkl"
-    if not os.path.exists(fp):
-        if not os.path.exists(f"data/{GPU}/results/flash_attn"):
-            os.makedirs(f"data/{GPU}/results/flash_attn")
-        df.to_pickle(fp)
+    # if isinstance(df, list):
+    #     assert len(df) == 1, f'expected 1 row, got {len(df)}'
+    #     df = df[0]
+    # fp = f"data/{GPU}/results/flash_attn/{config.Z}_{config.H}_{config.wl}_{config.D_HEAD}_{config.causal}_{config.seed}.pkl"
+    # if not os.path.exists(fp):
+    #     if not os.path.exists(f"data/{GPU}/results/flash_attn"):
+    #         os.makedirs(f"data/{GPU}/results/flash_attn")
+    #     df.to_pickle(fp)
 
 
 if __name__ == "__main__":

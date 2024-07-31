@@ -82,8 +82,8 @@ def parse_args() -> Config:
 
     parser.add_argument("--Z", type=int, dest="Z", default=1)
     parser.add_argument("--H", type=int, dest="H", default=32)
-    parser.add_argument("--wl", type=int, default=1024)
-    parser.add_argument("--dh", type=int, dest="D_HEAD", default=128)
+    parser.add_argument("--wl", type=int, default=4096)
+    parser.add_argument("--dh", type=int, dest="D_HEAD", default=64)
 
     parser.add_argument("-t", "--train", type=int, dest="train", default=1)
     parser.add_argument("-l", "--log", type=int, dest="log", default=1)
@@ -257,20 +257,3 @@ if __name__ == '__main__':
 
     if drl_config.tt:
         out_rms_triton = call_tt(x=embeddings_load, rms_w=rms_weights)
-
-    if bool(drl_config.bench):
-        print('BENCH...')
-        torch.cuda.synchronize()
-
-        ms = do_bench(lambda: call(_cuasmrl, load_dir, embeddings_load, rms_weights), warmup=100, rep=100)
-        ms_tt = do_bench(lambda: call_tt(x=embeddings_load, rms_w=rms_weights), warmup=100, rep=100)
-
-        data = {
-            'cuasmrl': ms,
-            'tt': ms_tt,
-        }
-        print(data)
-
-        fp = f"data/{GPU}/rmsnorm/{batch}_{heads}_{seq_len}_{dim}/bench_{drl_config.seed}.pkl"
-        with open(fp, 'wb') as f:
-            pickle.dump(data, f)
