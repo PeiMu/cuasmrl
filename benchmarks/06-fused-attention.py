@@ -527,10 +527,10 @@ def main():
         load_dir = config.load
 
     ## TEST
-    # fgk_out = call(q, k, v, M, o, grid, causal, sm_scale, cuasmrl_kernel, load_dir)
+    fgk_out = call(q, k, v, M, o, grid, causal, sm_scale, cuasmrl_kernel, load_dir)
     if config.tt:
         tri_out = triton_attn_forward(q, k, v, M, o, grid, causal, sm_scale, tt_attn)
-        # assert torch.allclose(tri_out, fgk_out, atol=1e-2, rtol=0)
+        assert torch.allclose(tri_out, fgk_out, atol=1e-2, rtol=0)
     print('TEST PASSED')
 
     if not config.bench:
@@ -562,11 +562,11 @@ def main():
             x_vals=[config.wl],
             line_arg="provider",
 
-            # line_vals=["fgk", "triton"] + (["flash"] if HAS_FLASH else []),
-            # line_names=["FGK", "Triton"] + (["Flash-2"] if HAS_FLASH else []),
+            line_vals=["fgk", "triton"] + (["flash"] if HAS_FLASH else []),
+            line_names=["FGK", "Triton"] + (["Flash-2"] if HAS_FLASH else []),
 
-            line_vals=["triton"] + (["flash"] if HAS_FLASH else []),
-            line_names=["Triton"] + (["Flash-2"] if HAS_FLASH else []),
+            # line_vals=["triton"] + (["flash"] if HAS_FLASH else []),
+            # line_names=["Triton"] + (["Flash-2"] if HAS_FLASH else []),
 
             styles=[("red", "-"), ("blue", "-"), ("green", "-")],
             ylabel="ms",
