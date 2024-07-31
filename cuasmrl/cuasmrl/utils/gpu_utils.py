@@ -25,6 +25,7 @@ MUTATABLE_OPS = {
         # ['LDGSTS', 'LDG', 'STG'],
         # ['LDSM', 'LDS', 'LDGSTS', 'LDG', 'STG'],
         # ['LDGDEPBAR', 'DEPBAR', 'EXIT', 'BAR.SYNC', 'BRA'],  # ban_ops
+        #['LDS', 'LDGSTS', 'LDG', ],
         ['LDS', 'LDGSTS', 'LDG', 'STG'],
         ['LDSM', 'LDGDEPBAR', 'DEPBAR', 'EXIT', 'BAR.SYNC', 'BRA'],  # ban_ops
     ),
@@ -80,9 +81,21 @@ def get_mutatable_ops(cc):
 def get_st_database(cc):
     if cc == (8, 0):
         return {
-            'IADD3': 9,
-            'IADD3.X': 5,
-            'IMAD.WIDE': 5,
+            # 'IADD3': 9,
+            # 'IADD3.X': 5,
+            # 'IMAD.WIDE': 5,
+            'IADD3': 4,
+            'IMAD.IADD': 4,
+            'IADD3.X': 4,
+            'MOV': 4,
+            'IABS': 4,
+            'IMAD': 4,
+            'FADD': 4,
+            'HADD2': 4,
+            'IMNMX': 4,
+            'SEL': 4,
+            'LEA': 4,
+            'S2R': 19,
         }
     else:
         raise RuntimeError(f'unsupported compute capability: {cc}')

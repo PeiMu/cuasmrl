@@ -12,8 +12,8 @@ MEMORY_OPS, BAN_OPS = get_mutatable_ops(CC)
 MEMORY_OPS_INDEX = {op: i for i, op in enumerate(MEMORY_OPS)}
 ST_WINDOW = get_st_window(CC)
 
-# MIN_ST_ANALYSIS = {}
-MIN_ST_ANALYSIS = get_st_database(CC)
+MIN_ST_ANALYSIS = {}
+ST_DB = get_st_database(CC)
 
 BLACK_LIST = set()
 
@@ -80,6 +80,15 @@ class Sample:
             MIN_ST_ANALYSIS,
             BLACK_LIST,
         )
+        for k, v in MIN_ST_ANALYSIS.items():
+            if k in ST_DB:
+                updated = min(ST_DB[k], v)
+                MIN_ST_ANALYSIS[k] = updated
+                logger.info(f'updating {k}: {v} -> {updated}')
+        # for k, v in ST_DB.items():
+        #     if k not in MIN_ST_ANALYSIS:
+        #         MIN_ST_ANALYSIS[k] = v
+
         self.candidates = candidates
         self.dims = dims
         return dims, kernel_lineno_cnt, mem_loc, max_src_len
