@@ -27,7 +27,7 @@ class Config:
     seed: int = 1337
     n_tests: int = 2
     load: Optional[str] = None
-    bench: int = 0
+    bench: bool = False
     tt: bool = False
 
     # Workload

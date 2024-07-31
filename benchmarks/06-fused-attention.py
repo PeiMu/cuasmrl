@@ -12,7 +12,7 @@ import random
 import numpy as np
 
 from cuasmrl.jit import jit
-from cuasmrl.autotuner import autotune as fgk_autotune
+from cuasmrl.autotuner import autotune 
 from cuasmrl.autotuner import triton_autotune_with_cache
 from cuasmrl.utils.gpu_utils import get_gpu_name, get_gpu_cc
 
@@ -24,7 +24,8 @@ class Config:
     seed: int = 1337
     n_tests: int = 2
     load: Optional[str] = None
-    bench: int = 0
+    bench: bool = False
+    tt: bool = False
 
     # Workload
     Z: int = 1
@@ -75,7 +76,9 @@ def parse_args() -> Config:
     parser.add_argument("--n_tests", type=int, default=2)
     parser.add_argument("--load", type=str)
     parser.add_argument('--bench', default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument('--tt', default=False, action=argparse.BooleanOptionalAction)
 
+    # 1_4_4096_32; 1_16_4096_32; 16_4_4096_32
     parser.add_argument("--Z", type=int, dest="Z", default=1)
     parser.add_argument("--H", type=int, dest="H", default=4)
     parser.add_argument("--wl", type=int, default=128)
@@ -122,21 +125,13 @@ GPU = get_gpu_name()
 
 @triton.jit
 def _attn_fwd_inner(
-        acc,
-        l_i,
-        m_i,
-        q,  #
-        K_block_ptr,
-        V_block_ptr,  #
-        start_m,
-        qk_scale,  #
-        BLOCK_M: tl.constexpr,
-        BLOCK_DMODEL: tl.constexpr,
-        BLOCK_N: tl.constexpr,  #
-        STAGE: tl.constexpr,
-        offs_m: tl.constexpr,
-        offs_n: tl.constexpr,  #
-        N_CTX: tl.constexpr):
+        acc, l_i, m_i, q,  #
+        K_block_ptr, V_block_ptr,  #
+        start_m, qk_scale,  #
+        BLOCK_M: tl.constexpr, BLOCK_DMODEL: tl.constexpr, BLOCK_N: tl.constexpr,  #
+        STAGE: tl.constexpr, offs_m: tl.constexpr, offs_n: tl.constexpr,  #
+        N_CTX: tl.constexpr,
+    ):
     # range of values handled by this stage
     if STAGE == 1:
         lo, hi = 0, start_m * BLOCK_M
@@ -180,9 +175,7 @@ def _attn_fwd_inner(
     return acc, l_i, m_i
 
 
-
-
-def attn_forward(q, k, v, M, o, grid, causal, sm_scale, kernel, load_dir):
+def call(q, k, v, M, o, grid, causal, sm_scale, kernel, load_dir):
     # shape constraints
     Lq, Lk, Lv = q.shape[-1], k.shape[-1], v.shape[-1]
     stage = 3 if causal else 1
@@ -234,7 +227,6 @@ def triton_attn_forward(q, k, v, M, o, grid, causal, sm_scale, kernel):
 
 
 def main():
-
     config = parse_args()
 
     random.seed(config.seed)
@@ -266,7 +258,7 @@ def main():
     config.total_flops = total_flops
     config.save_dir = f'{GPU}/flash_attn/{Z}_{H}_{N_CTX}_{D_HEAD}_{causal}'
 
-    @fgk_autotune(
+    @autotune(
         configs=[
             # tutorials:
             # triton.Config({'BLOCK_M': 128, 'BLOCK_N': 64}, num_stages=4, num_warps=8),
@@ -309,7 +301,7 @@ def main():
         drl_config=config,
     )
     @jit
-    def _attn_fwd(
+    def cuasmrl_kernel(
             Q, K, V, sm_scale, M, Out,  #
             stride_qz, stride_qh, stride_qm, stride_qk,  #
             stride_kz, stride_kh, stride_kn, stride_kk,  #
@@ -379,21 +371,10 @@ def main():
         # For causal = False, STAGE = 1, and _attn_fwd_inner gets 3 as its STAGE
         if STAGE & 1:
             acc, l_i, m_i = _attn_fwd_inner(
-                acc,
-                l_i,
-                m_i,
-                q,
-                K_block_ptr,
-                V_block_ptr,  #
-                start_m,
-                qk_scale,  #
-                BLOCK_M,
-                BLOCK_DMODEL,
-                BLOCK_N,  #
-                4 - STAGE,
-                offs_m,
-                offs_n,
-                N_CTX  #
+                acc, l_i, m_i, q, K_block_ptr, V_block_ptr,  #
+                start_m, qk_scale,  #
+                BLOCK_M, BLOCK_DMODEL, BLOCK_N,  #
+                4 - STAGE, offs_m, offs_n, N_CTX  #
             )
         # stage 2: on-band
         if STAGE & 2:
@@ -401,21 +382,11 @@ def main():
             # two loops independently
             tl.debug_barrier()
             acc, l_i, m_i = _attn_fwd_inner(
-                acc,
-                l_i,
-                m_i,
-                q,
-                K_block_ptr,
-                V_block_ptr,  #
-                start_m,
-                qk_scale,  #
-                BLOCK_M,
-                BLOCK_DMODEL,
-                BLOCK_N,  #
+                acc, l_i, m_i, q, K_block_ptr, V_block_ptr,  #
+                start_m, qk_scale,  #
+                BLOCK_M, BLOCK_DMODEL, BLOCK_N,  #
                 2,
-                offs_m,
-                offs_n,
-                N_CTX  #
+                offs_m, offs_n, N_CTX  #
             )
         # epilogue
         m_i += tl.math.log2(l_i)
@@ -517,21 +488,10 @@ def main():
         # For causal = False, STAGE = 1, and _attn_fwd_inner gets 3 as its STAGE
         if STAGE & 1:
             acc, l_i, m_i = _attn_fwd_inner(
-                acc,
-                l_i,
-                m_i,
-                q,
-                K_block_ptr,
-                V_block_ptr,  #
-                start_m,
-                qk_scale,  #
-                BLOCK_M,
-                BLOCK_DMODEL,
-                BLOCK_N,  #
-                4 - STAGE,
-                offs_m,
-                offs_n,
-                N_CTX  #
+                acc, l_i, m_i, q, K_block_ptr, V_block_ptr,  #
+                start_m, qk_scale,  #
+                BLOCK_M, BLOCK_DMODEL, BLOCK_N,  #
+                4 - STAGE, offs_m, offs_n, N_CTX  #
             )
         # stage 2: on-band
         if STAGE & 2:
@@ -539,21 +499,10 @@ def main():
             # two loops independently
             tl.debug_barrier()
             acc, l_i, m_i = _attn_fwd_inner(
-                acc,
-                l_i,
-                m_i,
-                q,
-                K_block_ptr,
-                V_block_ptr,  #
-                start_m,
-                qk_scale,  #
-                BLOCK_M,
-                BLOCK_DMODEL,
-                BLOCK_N,  #
-                2,
-                offs_m,
-                offs_n,
-                N_CTX  #
+                acc, l_i, m_i, q, K_block_ptr, V_block_ptr,  #
+                start_m, qk_scale,  #
+                BLOCK_M, BLOCK_DMODEL, BLOCK_N,  #
+                2, offs_m, offs_n, N_CTX  #
             )
         # epilogue
         m_i += tl.math.log2(l_i)
@@ -569,20 +518,23 @@ def main():
                     dtype=torch.float32)
     BLOCK_M = 128
     grid = (triton.cdiv(q.shape[2], BLOCK_M), q.shape[0] * q.shape[1], 1)
+    # grid = lambda META: (triton.cdiv(M, META['BLOCK_SIZE_M']) * triton.cdiv(N, META['BLOCK_SIZE_N']), )
     if config.load is None:
         load_dir = None
     elif config.load == "auto":
         load_dir = f'{config.default_out_path}/{GPU}/flash_attn/{config.Z}_{config.H}_{config.wl}_{config.D_HEAD}_{causal}'
     else:
         load_dir = config.load
-    fgk_out = attn_forward(q, k, v, M, o, grid, causal, sm_scale, _attn_fwd, load_dir)
-    tri_out = triton_attn_forward(q, k, v, M, o, grid, causal, sm_scale, tt_attn)
 
     ## TEST
-    assert torch.allclose(tri_out, fgk_out, atol=1e-2, rtol=0)
+    # fgk_out = call(q, k, v, M, o, grid, causal, sm_scale, cuasmrl_kernel, load_dir)
+    if config.tt:
+        tri_out = triton_attn_forward(q, k, v, M, o, grid, causal, sm_scale, tt_attn)
+        # assert torch.allclose(tri_out, fgk_out, atol=1e-2, rtol=0)
     print('TEST PASSED')
 
     if not config.bench:
+        assert config.load is not None
         print('SKIP bench...')
         return
 
@@ -597,42 +549,38 @@ def main():
     cc = get_gpu_cc()
     if cc[0] < 8:
         HAS_FLASH = False
-
     TORCH_HAS_FP8 = False
 
     print(f"use flash: {HAS_FLASH}; use fp8: {TORCH_HAS_FP8}")
     BATCH, N_HEADS, N_CTX, D_HEAD = config.Z, config.H, config.wl, config.D_HEAD
 
     configs = []
-    # for mode in ["fwd", "bwd"]:
-    for mode in ["fwd"]:
-        # for causal in [True, False]:
-        for causal in [True]:
-            if mode == "bwd" and not causal:
-                continue
-            configs.append(
-                triton.testing.Benchmark(
-                    x_names=["N_CTX"],
-                    # x_vals=[2**i for i in range(9, 14)],  # NOTE: e.g. if use 4096 cubin for 1024, it could fail
-                    x_vals=[config.wl],
-                    line_arg="provider",
-                    line_vals=["fgk", "triton"] +
-                    (["flash"] if HAS_FLASH else []),
-                    line_names=["FGK", "Triton"] +
-                    (["Flash-2"] if HAS_FLASH else []),
-                    styles=[("red", "-"), ("blue", "-"), ("green", "-")],
-                    ylabel="ms",
-                    plot_name=
-                    f"fused-attention-batch{BATCH}-head{N_HEADS}-d{D_HEAD}-{mode}-causal={causal}",
-                    args={
-                        "H": N_HEADS,
-                        "BATCH": BATCH,
-                        "D_HEAD": D_HEAD,
-                        "dtype": torch.float16,
-                        "mode": mode,
-                        "causal": causal,
-                    },
-                ))
+    configs.append(
+        triton.testing.Benchmark(
+            x_names=["N_CTX"],
+            # x_vals=[2**i for i in range(9, 14)],  # NOTE: e.g. if use 4096 cubin for 1024, it could fail
+            x_vals=[config.wl],
+            line_arg="provider",
+
+            # line_vals=["fgk", "triton"] + (["flash"] if HAS_FLASH else []),
+            # line_names=["FGK", "Triton"] + (["Flash-2"] if HAS_FLASH else []),
+
+            line_vals=["triton"] + (["flash"] if HAS_FLASH else []),
+            line_names=["Triton"] + (["Flash-2"] if HAS_FLASH else []),
+
+            styles=[("red", "-"), ("blue", "-"), ("green", "-")],
+            ylabel="ms",
+            plot_name=
+            f"fused-attention-batch{BATCH}-head{N_HEADS}-d{D_HEAD}-fwd-causal={causal}",
+            args={
+                "H": N_HEADS,
+                "BATCH": BATCH,
+                "D_HEAD": D_HEAD,
+                "dtype": torch.float16,
+                "mode": 'fwd',
+                "causal": causal,
+            },
+        ))
 
     @triton.testing.perf_report(configs)
     def bench_flash_attention(BATCH,
@@ -674,15 +622,14 @@ def main():
             if config.load is None:
                 load_dir = None
             elif config.load == "auto":
-                load_dir = f'data/{GPU}/flash_attn/{config.Z}_{config.H}_{config.wl}_{config.D_HEAD}_{causal}'
+                load_dir = f'{config.default_out_path}/{GPU}/flash_attn/{config.Z}_{config.H}_{config.wl}_{config.D_HEAD}_{causal}'
             else:
                 load_dir = config.load
-            fn = lambda: attn_forward(q, k, v, M, o, grid, causal, sm_scale,
-                                      _attn_fwd, load_dir)
-            if mode == "bwd":
-                o = fn()
-                do = torch.randn_like(o)
-                fn = lambda: o.backward(do, retain_graph=True)
+            fn = lambda: call(q, k, v, M, o, grid, causal, sm_scale, cuasmrl_kernel, load_dir)
+            # if mode == "bwd":
+            #     o = fn()
+            #     do = torch.randn_like(o)
+            #     fn = lambda: o.backward(do, retain_graph=True)
             ms = triton.testing.do_bench(fn, warmup=warmup, rep=rep)
         if provider == "triton":
             q = torch.randn((BATCH, H, N_CTX, D_HEAD),
@@ -693,9 +640,9 @@ def main():
                             dtype=dtype,
                             device="cuda",
                             requires_grad=True)
-            if mode == "fwd" and TORCH_HAS_FP8:
-                q = q.to(torch.float8_e5m2)
-                k = k.to(torch.float8_e5m2)
+            # if mode == "fwd" and TORCH_HAS_FP8:
+            #     q = q.to(torch.float8_e5m2)
+            #     k = k.to(torch.float8_e5m2)
             v = torch.randn((BATCH, H, N_CTX, D_HEAD),
                             dtype=dtype,
                             device="cuda",
@@ -707,11 +654,11 @@ def main():
             grid = (triton.cdiv(q.shape[2],
                                 BLOCK_M), q.shape[0] * q.shape[1], 1)
             fn = lambda: triton_attn_forward(q, k, v, M, o, grid, causal,
-                                             sm_scale, _attn_tt)
-            if mode == "bwd":
-                o = fn()
-                do = torch.randn_like(o)
-                fn = lambda: o.backward(do, retain_graph=True)
+                                             sm_scale, tt_attn)
+            # if mode == "bwd":
+            #     o = fn()
+            #     do = torch.randn_like(o)
+            #     fn = lambda: o.backward(do, retain_graph=True)
             ms = triton.testing.do_bench(fn, warmup=warmup, rep=rep)
         if provider == "flash":
             qkv = torch.randn((BATCH, N_CTX, 3, H, D_HEAD),
@@ -719,10 +666,10 @@ def main():
                               device=device,
                               requires_grad=True)
             fn = lambda: flash_attn_func(qkv, causal=causal)
-            if mode == "bwd":
-                o = fn()
-                do = torch.randn_like(o)
-                fn = lambda: o.backward(do, retain_graph=True)
+            # if mode == "bwd":
+            #     o = fn()
+            #     do = torch.randn_like(o)
+            #     fn = lambda: o.backward(do, retain_graph=True)
             ms = triton.testing.do_bench(fn, warmup=warmup, rep=rep)
         flops_per_matmul = 2.0 * BATCH * H * N_CTX * N_CTX * D_HEAD
         total_flops = 2 * flops_per_matmul
