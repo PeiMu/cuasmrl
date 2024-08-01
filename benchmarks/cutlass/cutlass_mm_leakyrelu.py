@@ -374,10 +374,10 @@ def main():
             x_vals=[0],  # Different possible values for `x_name`
             line_arg="provider",  # Argument name whose value corresponds to a different line in the plot
 
-            # line_vals=["triton", "cutlass", 'cuasmrl'],
-            # line_names=['triton', 'cutlass', 'cuasmrl'],
-            line_vals=["triton", "cutlass", ],
-            line_names=['triton', 'cutlass', ],
+            line_vals=["triton", "cutlass", 'cuasmrl'],
+            line_names=['triton', 'cutlass', 'cuasmrl'],
+            # line_vals=["triton", "cutlass", ],
+            # line_names=['triton', 'cutlass', ],
 
             styles=[("green", "-"), ("blue", "-"), ('red', '-')],
             ylabel="TFLOPS",  # Label name for the y-axis
