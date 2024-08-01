@@ -2,6 +2,9 @@ import os
 import argparse
 from dataclasses import dataclass, field
 
+from cuasmrl.backend import MutationEngine
+from functools import partial
+
 # yapf: disable
 @dataclass
 class Config:
@@ -15,138 +18,8 @@ def parse_args() -> Config:
     config = Config(**vars(args))
     return config
 
-def decode(line: str):
-    line = line.strip('\n')
-    line = line.split(' ')
-    n = len(line)
-
-    ctrl_code = None
-    predicate = None
-    comment = None
-    opcode = None
-    dest = None
-    src = []
-
-    idx = -1
-    for i in range(0, n):
-        if line[i] != '':
-            idx = i
-            ctrl_code = line[i]
-            break
-    assert idx > -1, f'no ctrl: {line}'
-
-    if ctrl_code.startswith('.'):
-        # labels
-        return None, None, None, None, None, None
-
-    for i in range(idx + 1, n):
-        if line[i] != '':
-            idx = i
-            comment = line[i]
-            break
-
-    for i in range(idx + 1, n):
-        if line[i] != '':
-
-            if line[i][0] == '@':
-                predicate = line[i]
-            else:
-                opcode = line[i]
-
-            idx = i
-            break
-
-    if opcode is None:
-        for i in range(idx + 1, n):
-            if line[i] != '':
-                opcode = line[i]
-                idx = i
-                break
-
-    for i in range(idx + 1, n):
-        if line[i] != '':
-            dest = line[i].strip(',')
-            idx = i
-            break
-
-    if dest == ';':
-        # LDGDEPBAR inst
-        dest = None
-
-    for i in range(idx + 1, n):
-        if line[i] == ';':
-            break
-
-        if line[i] != '':
-            src.append(line[i].strip(','))
-    
-    # post-process src; e.g. ['desc[UR16][R10.64] -> UR16, R10
-    processed_src = []
-    for i, word in enumerate(src):
-        if word.startswith('desc'):
-            w = word.replace(']', '').split('[')
-            for r in w[1:]: 
-                tmp = r.split('.')[0]  # R10.64 -> R10
-                processed_src.append(tmp)
-
-                # hidden deps
-                if r.endswith('.64'):
-                    val = int(tmp[1:])
-                    base = val//2
-                    mod = val%2
-                    comp = 1-mod
-                    hidden = base*2+comp
-                    processed_src.append(f'R{hidden}')
-
-        elif word.startswith('c'):
-            processed_src.append(word)
-        else:
-            tmp = word.strip(']').strip('[')
-            tmp = tmp.split('.')[0]  # R10.64 -> R10
-            tmp = tmp.split('+')[0]  # R10+0x2000 -> R10
-            processed_src.append(tmp)
-
-    # post-process dest; e.g. [R219+0x4000] -> R219
-    if dest is not None:
-        if dest.startswith('desc'):
-            w = dest.replace(']', '').split('[')
-            for r in w[1:]: 
-                tmp = r.split('.')[0]  # R10.64 -> R10
-                processed_src.append(tmp)  # <- in this case, it is treated as src
-
-                # hidden deps
-                if r.endswith('.64'):
-                    val = int(tmp[1:])
-                    base = val//2
-                    mod = val%2
-                    comp = 1-mod
-                    hidden = base*2+comp
-                    processed_src.append(f'R{hidden}')
-        else:
-            dest = dest.strip(']').strip('[')
-            dest = dest.split('.')[0]
-            dest = dest.split('+')[0]
-
-    # a hack for internal label
-    if ctrl_code.startswith('$__'):
-        ctrl_code = None
-    return ctrl_code, comment, predicate, opcode, dest, processed_src
-
-def decode_ctrl_code(ctrl_code: str):
-    ctrl_code = ctrl_code.split(':')
-    assert len(ctrl_code) == 5, f'invalid ctrl code: {ctrl_code}'
-
-    barr = ctrl_code[0][2:]
-    waits = []
-    for bar in barr:
-        if bar != '-':
-            waits.append(int(bar))
-
-    read = ctrl_code[1]
-    write = ctrl_code[2]
-    yield_flag = ctrl_code[3]
-    stall_count = ctrl_code[4]
-    return waits, read, write, yield_flag, stall_count
+decode = partial(MutationEngine.decode, None)
+decode_ctrl_code = partial(MutationEngine.decode_ctrl_code, None)
 
 def main():
 

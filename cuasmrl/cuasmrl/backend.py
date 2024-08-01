@@ -433,6 +433,13 @@ class MutationEngine:
                 tmp = tmp.split('+')[0]  # R10+0x2000 -> R10
                 processed_src.append(tmp)
 
+        # predicate should be ready
+        if predicate is not None:
+            tmp = predicate[1:]
+            if tmp[0] == '!':
+                tmp = tmp[1:]
+            processed_src.append(tmp)
+
         # post-process dest; e.g. [R219+0x4000] -> R219
         if dest is not None:
             if dest.startswith('desc'):
