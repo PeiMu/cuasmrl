@@ -443,6 +443,15 @@ class MutationEngine:
                     # e.g. STG.E desc[UR16][R10.64], R197 ;
                     # the dst needs to be ready
                     processed_src.append(tmp)
+
+                    # hidden deps
+                    if r.endswith('.64'):
+                        val = int(tmp[1:])
+                        base = val // 2
+                        mod = val % 2
+                        comp = 1 - mod
+                        hidden = base * 2 + comp
+                        processed_src.append(f'R{hidden}')
             else:
                 dest = dest.strip(']').strip('[')
                 dest = dest.split('.')[0]
