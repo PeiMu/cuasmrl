@@ -433,7 +433,7 @@ class MutationEngine:
                 tmp = tmp.split('+')[0]  # R10+0x2000 -> R10
                 processed_src.append(tmp)
 
-        # predicate should be ready
+        # predicate should be considered as src
         if predicate is not None:
             tmp = predicate[1:]
             if tmp[0] == '!':
