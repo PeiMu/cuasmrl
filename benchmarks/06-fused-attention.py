@@ -41,7 +41,7 @@ class Config:
     ## Env
     env_id: str = 'cuasmenv-v0'
     num_env: int = 1
-    num_iterations: int = int(1e3)
+    num_iterations: int = 200
     minibatch_size: int = 8
     horizon: int = 32
     num_steps: int = 64
@@ -72,17 +72,17 @@ def parse_args() -> Config:
 
     # Add arguments to the parser
     parser.add_argument("--default_out_path", type=str, default="data")
-    parser.add_argument("--seed", type=int, default=1337)
-    parser.add_argument("--n_tests", type=int, default=2)
+    parser.add_argument("--seed", type=int, default=1338)
+    parser.add_argument("--n_tests", type=int, default=5)
     parser.add_argument("--load", type=str)
     parser.add_argument('--bench', default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--tt', default=False, action=argparse.BooleanOptionalAction)
 
     # 1_4_4096_32; 1_16_4096_32; 16_4_4096_32
     parser.add_argument("--Z", type=int, dest="Z", default=1)
-    parser.add_argument("--H", type=int, dest="H", default=4)
-    parser.add_argument("--wl", type=int, default=128)
-    parser.add_argument("--dh", type=int, dest="D_HEAD", default=128)
+    parser.add_argument("--H", type=int, dest="H", default=16)
+    parser.add_argument("--wl", type=int, default=4096)
+    parser.add_argument("--dh", type=int, dest="D_HEAD", default=32)
     parser.add_argument('--causal', default=False, action=argparse.BooleanOptionalAction)
 
     parser.add_argument("-t", "--train", type=int, dest="train", default=1)
