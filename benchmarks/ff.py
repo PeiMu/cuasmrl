@@ -13,11 +13,10 @@ import random
 import numpy as np
 
 from cuasmrl.jit import jit
-from cuasmrl.autotuner import autotune as fgk_autotune
+from cuasmrl.autotuner import autotune 
 from cuasmrl.utils.gpu_utils import get_gpu_name, get_gpu_cc
 
 from cuasmrl.autotuner import triton_autotune_with_cache
-from cuasmrl.bench import do_bench
 
 # yapf: disable
 @dataclass
@@ -225,7 +224,7 @@ if __name__ == '__main__':
     else:
         load_dir = drl_config.load
 
-    @fgk_autotune(
+    @autotune(
         configs=[
 		triton.Config({'USE_FP8': False, 'EPS': 1e-6, 'BLOCK_SIZE_M':64, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=2, num_warps=2),
 
@@ -413,19 +412,3 @@ if __name__ == '__main__':
     if drl_config.tt:
         output_triton = call_tt(x=x, w1=w1_w, w3=w3_w, rms_w=rms_w, kernel=tt_ff)
 
-
-    if bool(drl_config.bench):
-        print('BENCH...')
-        torch.cuda.synchronize()
-
-        ms = do_bench(lambda: call(x, w1_w, w3_w, rms_w, cuasmrl_kernel, load_dir), warmup=100, rep=100)
-        ms_tt = do_bench(lambda: call_tt(x=x, w1=w1_w, w3=w3_w, rms_w=rms_w), warmup=100, rep=100)
-
-        data = {
-            'cuasmrl': ms,
-            'tt': ms_tt,
-        }
-
-        fp = f"data/{GPU}/ff/{B}_{M}_{N}_{K}/bench_{drl_config.seed}.pkl"
-        with open(fp, 'wb') as f:
-            pickle.dump(data, f)

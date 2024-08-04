@@ -362,9 +362,9 @@ def main():
     ############################## CUTLASS ##############################
 
     if not args.bench:
-        assert args.load is not None
         return 
 
+    assert args.load is not None
     configs = []
     configs.append(
         triton.testing.Benchmark(

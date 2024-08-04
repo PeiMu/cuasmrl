@@ -12,7 +12,7 @@ import random
 import numpy as np
 
 from cuasmrl.jit import jit
-from cuasmrl.autotuner import autotune 
+from cuasmrl.autotuner import autotune
 from cuasmrl.autotuner import triton_autotune_with_cache
 from cuasmrl.utils.gpu_utils import get_gpu_name, get_gpu_cc
 
@@ -72,8 +72,8 @@ def parse_args() -> Config:
 
     # Add arguments to the parser
     parser.add_argument("--default_out_path", type=str, default="data")
-    parser.add_argument("--seed", type=int, default=1338)
-    parser.add_argument("--n_tests", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--n_tests", type=int, default=10)
     parser.add_argument("--load", type=str)
     parser.add_argument('--bench', default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--tt', default=False, action=argparse.BooleanOptionalAction)
