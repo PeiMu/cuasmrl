@@ -9,11 +9,13 @@ from functools import partial
 @dataclass
 class Config:
     path: str = "data"
+    end: int = 5
 
 
 def parse_args() -> Config:
     parser = argparse.ArgumentParser(description="???")
-    parser.add_argument('-p', "--default_out_path", type=str, dest="path", default="data")
+    parser.add_argument('-p', type=str, dest="path", default="data")
+    parser.add_argument('-e', type=int, dest='end', default=5)
     args = parser.parse_args()
     config = Config(**vars(args))
     return config
@@ -43,7 +45,7 @@ def main():
             print(src)
             print()
 
-            if i > 5:
+            if i > config.end:
                 break
 
 if __name__ == "__main__":

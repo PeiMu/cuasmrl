@@ -413,12 +413,13 @@ class MutationEngine:
             if word.startswith('desc'):
                 w = word.replace(']', '').split('[')
                 for r in w[1:]:
-                    tmp = r.split('.')[0]  # R10.64 -> R10
-                    processed_src.append(tmp)
+                    strip_plus = r.split('+')[0]  # R10.64+0x80 -> R10.64
+                    strip_64 = strip_plus.split('.')[0]  # R10.64 -> R10
+                    processed_src.append(strip_64)
 
                     # hidden deps
-                    if r.endswith('.64'):
-                        val = int(tmp[1:])
+                    if strip_plus.endswith('.64'):
+                        val = int(strip_64[1:])
                         base = val // 2
                         mod = val % 2
                         comp = 1 - mod
@@ -429,8 +430,21 @@ class MutationEngine:
                 processed_src.append(word)
             else:
                 tmp = word.strip(']').strip('[')
-                tmp = tmp.split('.')[0]  # R10.64 -> R10
                 tmp = tmp.split('+')[0]  # R10+0x2000 -> R10
+
+                # XXX some possible suffix
+                # [R153.X4+0x10]
+                # SR_CTAID.Y
+                # 1.4426950216293334961
+                # R0.reuse
+                # if len(tmp.split('.')) > 1:
+                #     print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+                #     print(word)
+                #     print(tmp)
+                #     print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+                # XXX
+
+                tmp = tmp.split('.')[0]  # R10.64 -> R10
                 processed_src.append(tmp)
 
         # predicate should be considered as src
@@ -445,15 +459,16 @@ class MutationEngine:
             if dest.startswith('desc'):
                 w = dest.replace(']', '').split('[')
                 for r in w[1:]:
-                    tmp = r.split('.')[0]  # R10.64 -> R10
+                    strip_plus = r.split('+')[0]  # R10.64+0x80 -> R10.64
+                    strip_64 = strip_plus.split('.')[0]  # R10.64 -> R10
                     # In this case, it is treated as src
                     # e.g. STG.E desc[UR16][R10.64], R197 ;
                     # the dst needs to be ready
-                    processed_src.append(tmp)
+                    processed_src.append(strip_64)
 
                     # hidden deps
-                    if r.endswith('.64'):
-                        val = int(tmp[1:])
+                    if strip_plus.endswith('.64'):
+                        val = int(strip_64[1:])
                         base = val // 2
                         mod = val % 2
                         comp = 1 - mod

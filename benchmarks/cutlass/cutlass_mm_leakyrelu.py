@@ -136,6 +136,8 @@ def matmul(a, b, c, kernel, M, N, K, grid, load, activation=""):
     )
     return c
 
+def torch_matmul(a, b):
+    return torch.nn.functional.leaky_relu(torch.matmul(a, b)+1, negative_slope=0.01)
 
 
 
@@ -405,7 +407,7 @@ def main():
         quantiles = [0.5, 0.2, 0.8]
         if provider == 'cutlass':
             # ms, min_ms, max_ms = triton.testing.do_bench(lambda: plan.run(tensor_A, tensor_B, tensor_C, tensor_D, print_module=print_module), quantiles=quantiles, warmup=100, rep=100)
-            ms, min_ms, max_ms = triton.testing.do_bench(lambda: torch.nn.functional.leaky_relu(torch.matmul(a, b)),warmup=100, rep=100,  quantiles=quantiles)
+            ms, min_ms, max_ms = triton.testing.do_bench(lambda: torch_matmul(a, b) ,warmup=100, rep=100,  quantiles=quantiles)
         if provider == 'cuasmrl':
             ms, min_ms, max_ms = triton.testing.do_bench(lambda: matmul(a, b, c, cuasmrl_kernel, M, N, K, grid, load_dir, "leaky_relu"), quantiles=quantiles, warmup=100, rep=100)
         if provider == 'triton':
