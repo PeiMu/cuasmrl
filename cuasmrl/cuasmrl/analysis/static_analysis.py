@@ -29,8 +29,7 @@ def static_analysis(
         line = line.strip()
         # skip headers
         if len(line) > 0 and line[0] == '[':
-            out = engine.decode(line)
-            ctrl_code, _, predicate, opcode, dst, src = out
+            ctrl_code, _, predicate, opcode, dst, src, _ = engine.decode(line)
             if ctrl_code is None:
                 # a label
                 continue
@@ -84,18 +83,20 @@ def static_analysis(
                 candidates.pop(-1)
 
     logger.info('stall count analysis: ')
-    remove = []
+    # remove = []
+    # for k, v in min_st_analysis.items():
+    #     if v > 20:
+    #         remove.append(k)
+    #         logger.warning(f'pruning {k} -> {v}')
+    #     elif k.startswith('LDS'):
+    #         remove.append(k)
+    #         logger.warning(f'pruning {k} -> {v}')
+    #     else:
+    #         logger.info(f'{k} -> {v}')
+    # for k in remove:
+    #     min_st_analysis.pop(k)
     for k, v in min_st_analysis.items():
-        if v > 20:
-            remove.append(k)
-            logger.warning(f'pruning {k} -> {v}')
-        elif k.startswith('LDS'):
-            remove.append(k)
-            logger.warning(f'pruning {k} -> {v}')
-        else:
-            logger.info(f'{k} -> {v}')
-    for k in remove:
-        min_st_analysis.pop(k)
+        logger.info(f'{k} -> {v}')
 
     # dimension of the optimization problem
     dims = len(candidates)
@@ -127,7 +128,7 @@ def find_def_use(
         accum = 0
         # print('line: ', line)
         while True:
-            tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src = engine.decode(
+            tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src, _ = engine.decode(
                 kernel_section[idx - j].strip())
             if tmp_ctrl is None:
                 # if it is a label, don't care stall count

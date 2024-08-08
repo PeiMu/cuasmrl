@@ -31,7 +31,7 @@ def main():
         for i, line in enumerate(f):
             # print(line.rstrip())
 
-            ctrl_code, comment, predicate, opcode, dest, src = decode(line)
+            ctrl_code, comment, predicate, opcode, dest, src, meta = decode(line)
 
             print('line is ', line)
             print('decoding: ')
@@ -43,6 +43,7 @@ def main():
             print(opcode)
             print(dest)
             print(src)
+            print(meta)
             print()
 
             if i > config.end:

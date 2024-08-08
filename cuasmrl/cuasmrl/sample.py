@@ -80,11 +80,23 @@ class Sample:
             MIN_ST_ANALYSIS,
             BLACK_LIST,
         )
+        # update via DB
         for k, v in MIN_ST_ANALYSIS.items():
             if k in ST_DB:
                 updated = min(ST_DB[k], v)
                 MIN_ST_ANALYSIS[k] = updated
                 logger.info(f'updating {k}: {v} -> {updated}')
+        # prune
+        remove = []
+        for k, v in MIN_ST_ANALYSIS.items():
+            if v > 20:
+                remove.append(k)
+                logger.warning(f'pruning {k} -> {v}')
+            elif k.startswith('LDS'):
+                remove.append(k)
+                logger.warning(f'pruning {k} -> {v}')
+        for k in remove:
+            MIN_ST_ANALYSIS.pop(k)
         # for k, v in ST_DB.items():
         #     if k not in MIN_ST_ANALYSIS:
         #         MIN_ST_ANALYSIS[k] = v
@@ -103,8 +115,8 @@ class Sample:
             line = line.strip()
             # skip headers
             if len(line) > 0 and line[0] == '[':
-                out = self.engine.decode(line)
-                ctrl_code, _, predicate, opcode, dst, src = out
+                ctrl_code, _, predicate, opcode, dst, src, _ = self.engine.decode(
+                    line)
                 if ctrl_code is None:
                     # a label
                     continue
@@ -233,7 +245,7 @@ class Sample:
         w = -1 if w[1] == '-' else int(w[1])
 
         # if MemOp were to move up
-        p_ctrl_code, _, p_predicate, p_opcode, p_dest, p_src = self.engine.decode(
+        p_ctrl_code, _, p_predicate, p_opcode, p_dest, p_src, p_meta = self.engine.decode(
             prev_line)
         if p_ctrl_code is None:
             # NOT move across labels
@@ -253,6 +265,8 @@ class Sample:
                 src,
                 p_predicate,
                 predicate,
+                #
+                p_meta,
         ):
             mask[0] = 0
         else:
@@ -278,7 +292,7 @@ class Sample:
                     break
 
                 try:
-                    tmp_ctrl, *_, tmp_opcode, _, tmp_src = self.engine.decode(
+                    tmp_ctrl, *_, tmp_opcode, _, tmp_src, _ = self.engine.decode(
                         kernel_section[lineno + i].strip())
                 except:
                     # NOTE: decode gets error when (lineno + i) goes out of bounds,
@@ -306,7 +320,7 @@ class Sample:
                 if mask[0] == 0:
                     break
 
-                tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src = self.engine.decode(
+                tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src, _ = self.engine.decode(
                     kernel_section[lineno - i].strip())
                 if tmp_ctrl is None:
                     # if it is a label, don't care stall count
@@ -324,7 +338,7 @@ class Sample:
                     mask[0] = 0
 
         # if MemOp were to move down
-        p_ctrl_code, _, p_predicate, p_opcode, p_dest, p_src = self.engine.decode(
+        p_ctrl_code, _, p_predicate, p_opcode, p_dest, p_src, p_meta = self.engine.decode(
             post_line)
         if p_ctrl_code is None:
             # NOT move across labels
@@ -344,6 +358,8 @@ class Sample:
                 p_src,
                 predicate,
                 p_predicate,
+                #
+                p_meta,
         ):
             mask[1] = 0
         else:
@@ -365,7 +381,7 @@ class Sample:
                 if mask[1] == 0:
                     break
 
-                tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src = self.engine.decode(
+                tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src, _ = self.engine.decode(
                     kernel_section[lineno - i].strip())
                 if tmp_ctrl is None:
                     # if it is a label, don't care stall count

@@ -348,6 +348,9 @@ class MutationEngine:
         opcode = None
         dest = None
         src = []
+        meta = {
+            'reuse': [],
+        }
 
         # ctrl
         idx = -1
@@ -360,7 +363,7 @@ class MutationEngine:
 
         if ctrl_code.startswith('.'):
             # labels
-            return None, None, None, None, None, None
+            return None, None, None, None, None, None, None
 
         # comment
         for i in range(idx + 1, n):
@@ -444,6 +447,9 @@ class MutationEngine:
                 #     print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
                 # XXX
 
+                if tmp.endswith('reuse'):
+                    meta['reuse'].append(tmp)
+
                 tmp = tmp.split('.')[0]  # R10.64 -> R10
                 processed_src.append(tmp)
 
@@ -482,7 +488,7 @@ class MutationEngine:
         # a hack for internal label
         if ctrl_code.startswith('$__'):
             ctrl_code = None
-        return ctrl_code, comment, predicate, opcode, dest, processed_src
+        return ctrl_code, comment, predicate, opcode, dest, processed_src, meta
 
     def decode_ctrl_code(self, ctrl_code: str):
         ctrl_code = ctrl_code.split(':')

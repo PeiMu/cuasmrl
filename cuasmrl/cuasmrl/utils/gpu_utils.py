@@ -191,6 +191,8 @@ def check_adj_opcodes(
     cur_src,
     prev_predicate,
     cur_predicate,
+    #
+    meta,
 ):
     if cc == (7, 5):
         return True
@@ -235,6 +237,12 @@ def check_adj_opcodes(
         if prev_opcode.startswith('LDS') and cur_opcode.startswith('LDS'):
             if set(prev_src).intersection(cur_src):
                 return False
+
+        if prev_opcode.startswith('LDGSTS.E.BYPASS.128'):
+            if cur_opcode.startswith('IMAD.WIDE'):
+                # reorder reuse gpr causes error
+                if len(meta['reuse']) > 0:
+                    return False
 
         # from rbe
         # if prev_opcode.startswith('LDG.E.U16') and cur_opcode.startswith('PRMT'):
