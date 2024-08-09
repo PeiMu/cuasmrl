@@ -534,10 +534,10 @@ def main():
     print('TEST PASSED')
 
     if not config.bench:
-        assert config.load is not None
         print('SKIP bench...')
         return
 
+    assert config.load is not None
     torch.cuda.synchronize()
     try:
         from flash_attn.flash_attn_interface import \
