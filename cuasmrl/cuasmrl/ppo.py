@@ -163,7 +163,9 @@ def env_loop(env, config):
     optimizer = optim.Adam(agent.parameters(), lr=config.lr, eps=1e-5)
 
     # load the latest ckpt and clean up
-    ckpt_files = [f for f in os.listdir(save_path) if f.endswith('.pt')]
+    ckpt_files = []
+    if os.path.exists(save_path):
+        ckpt_files = [f for f in os.listdir(save_path) if f.endswith('.pt')]
     sorted_ckpt_files = sorted(
         ckpt_files,
         key=lambda x: int(x.strip('.pt').split('_')[-1]),
