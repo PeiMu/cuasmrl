@@ -318,7 +318,7 @@ def main():
         return c
 
     ############################## CUTLASS ##############################
-    # plan = cutlass.op.Gemm(element=np.float16, layout=cutlass.LayoutType.RowMajor)
+    plan = cutlass.op.Gemm(element=np.float16, layout=cutlass.LayoutType.RowMajor)
     # # plan = cutlass.op.Gemm(element=np.float16, layout=cutlass.LayoutType.ColumnMajor)
 
     # # print avialable act
@@ -331,25 +331,25 @@ def main():
 
     # # NOTE: This controls whether ther C++ GEMM declaration will be printed at each step. Set to `false` to
     # # omit this information.
-    # print_module = False
+    print_module = False
 
-    # type_A = np.float16
-    # type_B = np.float16
-    # type_C = np.float16
-    # type_D = np.float16
+    type_A = np.float16
+    type_B = np.float16
+    type_C = np.float16
+    type_D = np.float16
 
-    # np.random.seed(1234)
-    # scope_min = -4
-    # scope_max = 4
-    # tensor_A = np.ceil(np.random.uniform(low=scope_min, high=scope_max, size=(M, K)).astype(type_A))
-    # tensor_B = np.ceil(np.random.uniform(low=scope_min, high=scope_max, size=(K, N)).astype(type_B))
-    # tensor_C = np.ceil(np.random.uniform(low=scope_min, high=scope_max, size=(M, N)).astype(type_C))
+    np.random.seed(1234)
+    scope_min = -4
+    scope_max = 4
+    tensor_A = np.ceil(np.random.uniform(low=scope_min, high=scope_max, size=(M, K)).astype(type_A))
+    tensor_B = np.ceil(np.random.uniform(low=scope_min, high=scope_max, size=(K, N)).astype(type_B))
+    tensor_C = np.ceil(np.random.uniform(low=scope_min, high=scope_max, size=(M, N)).astype(type_C))
 
-    # alpha = np.float16(1.)
-    # beta = np.float16(0.)
+    alpha = np.float16(1.)
+    beta = np.float16(0.)
 
-    # tensor_D = np.zeros(tensor_C.shape).astype(type_D)
-    # tensor_D_relu = np.zeros(tensor_C.shape).astype(type_D)
+    tensor_D = np.zeros(tensor_C.shape).astype(type_D)
+    tensor_D_relu = np.zeros(tensor_C.shape).astype(type_D)
 
     # # test relu
     # # plan.activation = "relu"
@@ -357,10 +357,10 @@ def main():
     # # relu_ref = (tensor_D >= 0).astype(type_D) * tensor_D
     # # np.testing.assert_array_equal(relu_ref, tensor_D_relu)
 
-    # # leaky_relu
-    # negative_slope = 0.01
-    # plan.activation = ("leaky_relu", negative_slope)
-    # plan.run(tensor_A, tensor_B, tensor_C, tensor_D, print_module=print_module)
+    # leaky_relu
+    negative_slope = 0.01
+    plan.activation = ("leaky_relu", negative_slope)
+    plan.run(tensor_A, tensor_B, tensor_C, tensor_D, print_module=print_module)
     ############################## CUTLASS ##############################
 
     if not args.bench:
@@ -376,12 +376,12 @@ def main():
             x_vals=[0],  # Different possible values for `x_name`
             line_arg="provider",  # Argument name whose value corresponds to a different line in the plot
 
-            line_vals=["triton", "cutlass", 'cuasmrl'],
-            line_names=['triton', 'cutlass', 'cuasmrl'],
+            line_vals=["triton", 'cuasmrl', 'cutlass', 'torch'],
+            line_names=['triton', 'cuasmrl', 'cutlass', 'torch'],
             # line_vals=["triton", "cutlass", ],
             # line_names=['triton', 'cutlass', ],
 
-            styles=[("green", "-"), ("blue", "-"), ('red', '-')],
+            styles=[("green", "-"), ("blue", "-"), ('red', '-'), ('pink', '-')],
             ylabel="TFLOPS",  # Label name for the y-axis
             plot_name="matmul-performance-" + "fp16",  
             args={"fp8_inputs": None},
@@ -406,7 +406,8 @@ def main():
 
         quantiles = [0.5, 0.2, 0.8]
         if provider == 'cutlass':
-            # ms, min_ms, max_ms = triton.testing.do_bench(lambda: plan.run(tensor_A, tensor_B, tensor_C, tensor_D, print_module=print_module), quantiles=quantiles, warmup=100, rep=100)
+            ms, min_ms, max_ms = triton.testing.do_bench(lambda: plan.run(tensor_A, tensor_B, tensor_C, tensor_D, print_module=print_module), quantiles=quantiles, warmup=100, rep=100)
+        if provider == 'torch':
             ms, min_ms, max_ms = triton.testing.do_bench(lambda: torch_matmul(a, b) ,warmup=100, rep=100,  quantiles=quantiles)
         if provider == 'cuasmrl':
             ms, min_ms, max_ms = triton.testing.do_bench(lambda: matmul(a, b, c, cuasmrl_kernel, M, N, K, grid, load_dir, "leaky_relu"), quantiles=quantiles, warmup=100, rep=100)

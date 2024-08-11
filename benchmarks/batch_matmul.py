@@ -27,7 +27,7 @@ class Config:
     seed: int = 1337
     n_tests: int = 2
     load: Optional[str] = None
-    bench: int = 0
+    bench: bool = False
     tt: bool = False
 
     # Workload
@@ -77,7 +77,7 @@ def parse_args() -> Config:
     parser.add_argument("--seed", type=int, default=1337)
     parser.add_argument("--n_tests", type=int, default=2)
     parser.add_argument("--load", type=str)
-    parser.add_argument("--bench", type=int, default=0)
+    parser.add_argument('--bench', default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--tt', default=False, action=argparse.BooleanOptionalAction)
 
     parser.add_argument("-b", type=int,  default=2)
@@ -125,48 +125,18 @@ GPU = get_gpu_name()
 # CREDITS: Initially inspired by the Triton tutorial
 
 
-def call_tt(kernel, a, b):
-    # checks constraints
-    assert a.shape[2] == b.shape[1], "incompatible dimensions"
-    assert a.is_contiguous(), "matrix A must be contiguous"
-    assert b.is_contiguous(), "matrix B must be contiguous"
+def call_tt(kernel, a, b, c, grid):
     batch_size, M, K = a.shape
     _, K, N = b.shape
-    # assert (
-    #         K % 32 == 0
-    # ), "We don't check memory-out-of-bounds with K so K must be divisible by BLOCK_K_SIZE"
-    # allocates output
-    c = torch.empty((batch_size, M, N), device=a.device, dtype=a.dtype)
-    # 1D launch kernel where each block gets its own program.
-
-    grid = lambda META: (  # noqa: E731
-        triton.cdiv(M, META["BLOCK_M_SIZE"]) * triton.cdiv(N, META["BLOCK_N_SIZE"]),
-        batch_size,
-    )
     kernel[grid](
         a, b, c, M, N, K,
         a.stride(0), a.stride(1), a.stride(2), b.stride(0), b.stride(1), b.stride(2), c.stride(0), c.stride(1), c.stride(2),
     )
     return c
 
-def call(kernel, load_dir, a, b):
-    # checks constraints
-    assert a.shape[2] == b.shape[1], "incompatible dimensions"
-    assert a.is_contiguous(), "matrix A must be contiguous"
-    assert b.is_contiguous(), "matrix B must be contiguous"
+def call(kernel, load_dir, a, b, c, grid):
     batch_size, M, K = a.shape
     _, K, N = b.shape
-    # assert (
-    #         K % 32 == 0
-    # ), "We don't check memory-out-of-bounds with K so K must be divisible by BLOCK_K_SIZE"
-    # allocates output
-    c = torch.empty((batch_size, M, N), device=a.device, dtype=a.dtype)
-    # 1D launch kernel where each block gets its own program.
-
-    grid = lambda META: (  # noqa: E731
-        triton.cdiv(M, META["BLOCK_M_SIZE"]) * triton.cdiv(N, META["BLOCK_N_SIZE"]),
-        batch_size,
-    )
     kernel[grid](
         a, b, c, M, N, K,
         a.stride(0), a.stride(1), a.stride(2), b.stride(0), b.stride(1), b.stride(2), c.stride(0), c.stride(1), c.stride(2),
@@ -174,8 +144,7 @@ def call(kernel, load_dir, a, b):
     )
     return c
 
-
-if __name__ == '__main__':
+def main():
     drl_config = parse_args()
 
     random.seed(drl_config.seed)
@@ -184,13 +153,17 @@ if __name__ == '__main__':
 
     B, M, N, K = drl_config.b, drl_config.m, drl_config.n, drl_config.k
 
+    dtype = torch.float16
     a = torch.randn((B, M, K), device="cuda", dtype=torch.float16, requires_grad=False)
     b = torch.randn((B, K, N), device="cuda", dtype=torch.float16, requires_grad=False)
-
 
     drl_config.total_flops = 2*B * M * N * K
     drl_config.save_dir = f'{GPU}/bmm/{B}_{M}_{N}_{K}'
 
+    grid = lambda META: (  # noqa: E731
+        triton.cdiv(M, META["BLOCK_M_SIZE"]) * triton.cdiv(N, META["BLOCK_N_SIZE"]),
+        B,
+    )
     if drl_config.load is None:
         load_dir = None
     elif drl_config.load == "auto":
@@ -313,30 +286,17 @@ if __name__ == '__main__':
     @triton.jit
     def tt(
         # Pointers to matrices
-        a_ptr,
-        b_ptr,
-        c_ptr,
+        a_ptr, b_ptr, c_ptr,
         # Matrix dimensions
-        m_size,
-        n_size,
-        k_size,
+        m_size, n_size, k_size,
         # The stride variables represent how much to increase the ptr by when moving by 1
         # element in a particular dimension. E.g. stride_am is how much to increase a_ptr
         # by to get the element one row down (A has M rows)
-        a_batch_stride,
-        a_m_stride,
-        a_k_stride,
-        b_batch_stride,
-        b_k_stride,
-        b_n_stride,
-        c_batch_stride,
-        c_m_stride,
-        c_n_stride,
+        a_batch_stride, a_m_stride, a_k_stride,
+        b_batch_stride, b_k_stride, b_n_stride,
+        c_batch_stride, c_m_stride, c_n_stride,
         # Meta-parameters
-        BLOCK_M_SIZE: tl.constexpr,
-        BLOCK_N_SIZE: tl.constexpr,
-        BLOCK_K_SIZE: tl.constexpr,
-        GROUP_M_SIZE: tl.constexpr,
+        BLOCK_M_SIZE: tl.constexpr, BLOCK_N_SIZE: tl.constexpr, BLOCK_K_SIZE: tl.constexpr, GROUP_M_SIZE: tl.constexpr,
     ):
         """Kernel for computing the matmul C = A x B.
         A has shape (M, K), B has shape (K, N) and C has shape (M, N)
@@ -430,7 +390,47 @@ if __name__ == '__main__':
         c_ptr_mask = (c_m_offs[:, None] < m_size) & (c_n_offs[None, :] < n_size)
         tl.store(c_ptrs, c, mask=c_ptr_mask)
 
-    call(cuasmrl, load_dir, a, b)
+    c = torch.empty((B, M, N), device=a.device, dtype=a.dtype)
+    call(cuasmrl, load_dir, a, b, c, grid)
 
     if drl_config.tt:
-        out_rms_triton = call_tt(tt, a, b)
+        out_tt = call_tt(tt, a, b, c, grid)
+
+    if not drl_config.bench:
+        print('SKIP bench...')
+        return
+
+    torch.cuda.synchronize()
+    @triton.testing.perf_report(
+        triton.testing.Benchmark(
+            x_names=['NA'],  # argument names to use as an x-axis for the plot
+            #x_vals=[128 * i for i in range(2, 100)],  # different possible values for `x_name`
+            x_vals=[0],  
+            line_arg='provider',  # argument name whose value corresponds to a different line in the plot
+            line_vals=['triton', 'torch', 'cuasmrl'],  # possible values for `line_arg``
+            line_names=[
+                "Triton",
+                "Torch",
+                'cuasmrl',
+            ],  
+            styles=[('blue', '-'), ('green', '-'), ('red', '-')], 
+            ylabel="GB/s",  # label name for the y-axis
+            plot_name="softmax-performance",  
+            #args={'M': 4096},  # values for function arguments not in `x_names` and `y_name`
+            args={},
+        ))
+    def benchmark(NA, provider):
+        c = torch.empty((B, M, N), device=a.device, dtype=a.dtype)
+        if provider == 'torch':
+            ms = triton.testing.do_bench(lambda: torch.bmm(a, b), warmup=100, rep=100)
+        if provider == 'triton':
+            ms = triton.testing.do_bench(lambda: call_tt(tt, a, b, c, grid), warmup=100, rep=100)
+        if provider == 'cuasmrl':
+            ms = triton.testing.do_bench(lambda: call(cuasmrl, load_dir, a, b, c, grid), warmup=100, rep=100)
+        perf = lambda ms: 2 * B * M * N * K * 1e-12 / (ms * 1e-3)
+        return perf(ms)
+
+    benchmark.run(show_plots=True, print_data=True)
+
+if __name__ == '__main__':
+    main()
