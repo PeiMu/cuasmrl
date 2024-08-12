@@ -176,7 +176,7 @@ class Env(gym.Env):
         elif not test_ok:
             # test failed
             info['status'] = Status.TESTFAIL
-            reward = -1
+            reward = -5
             terminated = True
 
             # trace error

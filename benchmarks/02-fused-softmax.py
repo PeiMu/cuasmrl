@@ -315,12 +315,12 @@ def main():
             #x_vals=[128 * i for i in range(2, 100)],  # different possible values for `x_name`
             x_vals=[0],  
             line_arg='provider',  # argument name whose value corresponds to a different line in the plot
-            line_vals=['triton', 'torch', 'cuasmrl'],  # possible values for `line_arg``
-            line_names=[
-                "Triton",
-                "Torch",
-                'cuasmrl',
-            ],  # label name for the lines
+
+            line_vals=['triton', 'torch', 'cuasmrl'],  
+            line_names=[ "Triton", "Torch", 'cuasmrl', ],
+            # line_vals=['triton', 'torch', ],
+            # line_names=[ "Triton", "Torch", ],
+
             styles=[('blue', '-'), ('green', '-'), ('red', '-')], 
             ylabel="GB/s",  # label name for the y-axis
             plot_name="softmax-performance",  
