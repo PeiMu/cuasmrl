@@ -13,7 +13,7 @@ import random
 import numpy as np
 
 from cuasmrl.jit import jit
-from cuasmrl.autotuner import autotune 
+from cuasmrl.autotuner import autotune as fgk_autotune
 from cuasmrl.utils.gpu_utils import get_gpu_name, get_gpu_cc
 
 from cuasmrl.autotuner import triton_autotune_with_cache
@@ -76,7 +76,7 @@ def parse_args() -> Config:
     parser.add_argument("--seed", type=int, default=1337)
     parser.add_argument("--n_tests", type=int, default=2)
     parser.add_argument("--load", type=str)
-    parser.add_argument("--bench", type=int, default=0)
+    parser.add_argument('--bench', default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--tt', default=False, action=argparse.BooleanOptionalAction)
 
     parser.add_argument("-b", type=int, default=1)
@@ -126,24 +126,10 @@ GPU = get_gpu_name()
 
 
 
-def call_tt(x: torch.Tensor, w1: torch.Tensor, w3: torch.Tensor, rms_w: torch.Tensor, kernel) -> torch.Tensor:
-    assert x.dtype == torch.float16
-    assert w1.dtype == w3.dtype == rms_w.dtype
-    assert w1.dtype in [torch.int8, torch.float16]
-    assert w1.shape == w3.shape
-
+def call_tt(M, N, K,x, x_reshape, w1, w3, rms_w, kernel, grid, out) -> torch.Tensor:
     w1_t = w1.t()
     w3_t = w3.t()
 
-    batch, seq_len, dim = x.shape
-    M, K = batch * seq_len, dim
-
-    N = w1_t.shape[1]
-    assert K == w1_t.shape[0]
-    assert w1_t.shape == w3_t.shape
-    x_reshape = x.reshape(M, K)
-    out = torch.empty((M, N), dtype=x.dtype, device=x.device)
-    grid = lambda META: (triton.cdiv(META["M"], META["BLOCK_SIZE_M"]) * triton.cdiv(META["N"], META["BLOCK_SIZE_N"]),)
     kernel[grid](
         x_reshape, w1_t, w3_t, out, rms_w,
         M, N, K,
@@ -158,27 +144,13 @@ def call_tt(x: torch.Tensor, w1: torch.Tensor, w3: torch.Tensor, rms_w: torch.Te
         # num_stages=2, num_warps=2,
         # GROUP_SIZE_M=8,
     )
-    out = out.view(batch, seq_len, -1)
+    # out = out.view(batch, seq_len, -1)
     return out
 
-def call(x: torch.Tensor, w1: torch.Tensor, w3: torch.Tensor, rms_w: torch.Tensor, kernel, load_dir) -> torch.Tensor:
-    assert x.dtype == torch.float16
-    assert w1.dtype == w3.dtype == rms_w.dtype
-    assert w1.dtype in [torch.int8, torch.float16]
-    assert w1.shape == w3.shape
-
+def call(M, N, K, x, x_reshape, w1, w3, rms_w, kernel, grid, out, load_dir) -> torch.Tensor:
     w1_t = w1.t()
     w3_t = w3.t()
 
-    batch, seq_len, dim = x.shape
-    M, K = batch * seq_len, dim
-
-    N = w1_t.shape[1]
-    assert K == w1_t.shape[0]
-    assert w1_t.shape == w3_t.shape
-    x_reshape = x.reshape(M, K)
-    out = torch.empty((M, N), dtype=x.dtype, device=x.device)
-    grid = lambda META: (triton.cdiv(META["M"], META["BLOCK_SIZE_M"]) * triton.cdiv(META["N"], META["BLOCK_SIZE_N"]),)
     kernel[grid](
         x_reshape, w1_t, w3_t, out, rms_w,
         M, N, K,
@@ -195,11 +167,11 @@ def call(x: torch.Tensor, w1: torch.Tensor, w3: torch.Tensor, rms_w: torch.Tenso
         # num_stages=2, num_warps=4
         load_dir=load_dir,
     )
-    out = out.view(batch, seq_len, -1)
+    # out = out.view(batch, seq_len, -1)
     return out
 
 
-if __name__ == '__main__':
+def main():
     drl_config = parse_args()
 
     random.seed(drl_config.seed)
@@ -209,6 +181,7 @@ if __name__ == '__main__':
     B, M, K, N = drl_config.b, drl_config.m, drl_config.k, drl_config.n
 
     x = torch.randn([B, M, K], dtype=torch.float16, device="cuda")
+    x_reshape = x.reshape(B*M, K)
     # weights tends to be very small values
     rms_w = torch.randn([K], dtype=torch.float16, device="cuda") * 0.2
     w1_w = torch.randn([N, K], dtype=torch.float16, device="cuda") * 0.2
@@ -224,9 +197,10 @@ if __name__ == '__main__':
     else:
         load_dir = drl_config.load
 
-    @autotune(
-        configs=[
+    grid = lambda META: (triton.cdiv(META["M"], META["BLOCK_SIZE_M"]) * triton.cdiv(META["N"], META["BLOCK_SIZE_N"]),)
 
+    @fgk_autotune(
+        configs=[
             triton.Config({'USE_FP8': False, 'EPS': 1e-6, 'BLOCK_SIZE_M':64, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=2, num_warps=2),
 
             triton.Config({'BLOCK_SIZE_M': 128, 'BLOCK_SIZE_N': 256, 'BLOCK_SIZE_K': 64, 'GROUP_SIZE_M':8, 'USE_FP8': False, 'EPS': 1e-6 }, num_stages=3, num_warps=8),
@@ -242,7 +216,6 @@ if __name__ == '__main__':
 
             # origin
             triton.Config({'BLOCK_SIZE_M': 16, 'BLOCK_SIZE_N': 16, 'BLOCK_SIZE_K': 64, 'GROUP_SIZE_M':8, 'USE_FP8': False, 'EPS': 1e-6 }, num_stages=2, num_warps=4),
-
     ],
         key=['M', 'N', 'K'],
         # reset_to_zero=['c_ptr'],
@@ -332,7 +305,15 @@ if __name__ == '__main__':
         tl.store(out_ptrs, accumulator, mask=out_mask)
 
 
-    @triton_autotune_with_cache(
+    # @triton_autotune_with_cache(
+    #     configs=[
+		# triton.Config({'USE_FP8': False, 'EPS': 1e-6, 'BLOCK_SIZE_M':64, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=2, num_warps=2),
+
+    # ],
+    #     key=['M', 'N', 'K'],
+    #     drl_config=drl_config,
+    # )
+    @triton.autotune(
         configs=[
             triton.Config({'USE_FP8': False, 'EPS': 1e-6, 'BLOCK_SIZE_M':64, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=2, num_warps=2),
 
@@ -349,10 +330,8 @@ if __name__ == '__main__':
 
             # origin
             triton.Config({'BLOCK_SIZE_M': 16, 'BLOCK_SIZE_N': 16, 'BLOCK_SIZE_K': 64, 'GROUP_SIZE_M':8, 'USE_FP8': False, 'EPS': 1e-6 }, num_stages=2, num_warps=4),
-
-    ],
+        ],
         key=['M', 'N', 'K'],
-        drl_config=drl_config,
     )
     @triton.jit
     def tt_ff(
@@ -434,10 +413,73 @@ if __name__ == '__main__':
         tl.store(out_ptrs, accumulator, mask=out_mask)
 
 
+    def rms_norm_pytorch(x: torch.Tensor, rms_w: torch.Tensor, eps=1e-6) -> torch.Tensor:
+        x = x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + eps)
+        return x * rms_w
+
+
+    def ff_pytorch(x: torch.Tensor, w1: torch.Tensor, w3: torch.Tensor, rms_w: torch.Tensor) -> torch.Tensor:
+        #x_norm = rms_norm_pytorch(x, rms_w, eps=1e-6)
+        x_norm = x
+        a = torch.nn.functional.silu(torch.matmul(x_norm, w1.t()))
+        b = torch.matmul(x_norm, w3.t())
+        return a * b
+
 
     # invoke
-    call(x, w1_w, w3_w, rms_w, cuasmrl_kernel, load_dir)
+    # out = call(x, w1_w, w3_w, rms_w, cuasmrl_kernel, load_dir)
 
-    if drl_config.tt:
-        output_triton = call_tt(x=x, w1=w1_w, w3=w3_w, rms_w=rms_w, kernel=tt_ff)
+    # if drl_config.tt:
 
+    #     o = torch.empty((M*B, N), dtype=x.dtype, device=x.device)
+    #     ref = call_tt(x, x_reshape, w1_w, w3_w, rms_w, tt_ff, grid,o)
+    #     #ref = ff_pytorch(x, w1_w, w3_w, rms_w)
+    #     print(f'max diff: {torch.max(torch.abs(out - ref))}')
+    #     assert torch.allclose(out, ref, atol=1e-1), f"max diff: {torch.max(torch.abs(out - ref))}"
+
+
+    if not drl_config.bench:
+        return 
+
+    assert drl_config.load is not None
+    torch.cuda.synchronize()
+
+    configs = []
+    configs.append(
+        triton.testing.Benchmark(
+            x_names=["NA"],  # Argument names to use as an x-axis for the plot
+            # x_vals=[128 * i for i in range(2, 33)],  # Different possible values for `x_name`
+            #x_vals=[2 ** i for i in range(8, 13)],  # Different possible values for `x_name`
+            x_vals=[0],  # Different possible values for `x_name`
+            line_arg="provider",  # Argument name whose value corresponds to a different line in the plot
+
+            line_vals=['triton','cuasmrl', 'torch'],
+            line_names=['triton','cuasmrl', 'torch'],
+
+            # line_vals=['triton', 'torch'],
+            # line_names=['triton', 'torch'],
+
+            styles=[("green", "-"), ("blue", "-"), ('red', '-')],
+            ylabel="TFLOPS",  # Label name for the y-axis
+            plot_name='ff',
+            args={"fp8_inputs": None},
+        ))
+
+    @triton.testing.perf_report(configs)
+    def benchmark(NA, provider, fp8_inputs):
+        quantiles = [0.5, 0.2, 0.8]
+        o = torch.empty((M*B, N), dtype=x.dtype, device=x.device)
+        if provider == 'torch':
+            ms, min_ms, max_ms = triton.testing.do_bench(lambda: ff_pytorch(x, w1_w, w3_w, rms_w), quantiles=quantiles, warmup=100, rep=100)
+        if provider == 'cuasmrl':
+            ms, min_ms, max_ms = triton.testing.do_bench(lambda: call(B*M, N, K, x, x_reshape, w1_w, w3_w, rms_w, cuasmrl_kernel, grid, o, load_dir), quantiles=quantiles, warmup=100, rep=100)
+        if provider == 'triton':
+            ms, min_ms, max_ms = triton.testing.do_bench(lambda: call_tt(B*M, N, K,x, x_reshape, w1_w, w3_w, rms_w, tt_ff, grid,o), quantiles=quantiles, warmup=100, rep=100)
+        perf = lambda ms: B * 2 * M * N * K * 1e-12 / (ms * 1e-3)
+        return perf(ms), perf(max_ms), perf(min_ms)
+    
+    benchmark.run(show_plots=True, print_data=True)
+
+
+if __name__ == '__main__':
+    main()
