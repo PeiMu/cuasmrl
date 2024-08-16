@@ -488,6 +488,7 @@ def env_loop(env, config):
 
 
 def inference(env, config):
+    torch.manual_seed(0)
     save_path = os.path.join(config.default_out_path, config.save_dir)
     device = torch.device(
         "cuda" if torch.cuda.is_available() and config.gpu == 1 else "cpu")
