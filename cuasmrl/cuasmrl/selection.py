@@ -73,6 +73,7 @@ def run_selection(
         cap.parse_from_buffer(standard_sass)
         cubin = cap.dump_cubin()
         ok = True  # skip verification
+        test_all = False
 
     else:
         rankings = {}
