@@ -80,7 +80,7 @@ def parse_args() -> Config:
 
     # 1_4_4096_32; 1_16_4096_32; 16_4_4096_32
     parser.add_argument("--Z", type=int, dest="Z", default=1)
-    parser.add_argument("--H", type=int, dest="H", default=16)
+    parser.add_argument("--H", type=int, dest="H", default=4)
     parser.add_argument("--wl", type=int, default=4096)
     parser.add_argument("--dh", type=int, dest="D_HEAD", default=32)
     parser.add_argument('--causal', default=False, action=argparse.BooleanOptionalAction)
