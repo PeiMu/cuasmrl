@@ -25,6 +25,12 @@ def static_analysis(
     kernel_lineno_cnt = 0
     mem_loc = {}
     max_src_len = 0
+
+    # analysis-only
+    num_mem_inst = 0
+    num_infer = 0
+    # analysis-only
+
     for i, line in enumerate(kernel_section):
         line = line.strip()
         # skip headers
@@ -68,6 +74,7 @@ def static_analysis(
                     is_mem = True
                     break
             if is_mem:
+                num_mem_inst += 1
                 resolved = find_def_use(
                     kernel_section,
                     engine,
@@ -77,11 +84,14 @@ def static_analysis(
                     src,
                     debug,
                 )
+            if is_mem and resolved:
+                num_infer += 1
             # XXX a hack for blacklist
             if is_mem and not resolved:
                 black_list.add(line)
                 candidates.pop(-1)
 
+    print()
     logger.info('stall count analysis: ')
     # remove = []
     # for k, v in min_st_analysis.items():
@@ -97,6 +107,9 @@ def static_analysis(
     #     min_st_analysis.pop(k)
     for k, v in min_st_analysis.items():
         logger.info(f'{k} -> {v}')
+    logger.info(
+        f'num_black_list={len(black_list)}; {num_infer=}; {num_mem_inst=}')
+    print()
 
     # dimension of the optimization problem
     dims = len(candidates)

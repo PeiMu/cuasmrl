@@ -81,7 +81,7 @@ def parse_args():
     parser.add_argument("-b", type=int, default=1)
     parser.add_argument("-m", type=int, default=512)
     parser.add_argument("-n", type=int, default=512)
-    parser.add_argument("-k", type=int, default=2048)
+    parser.add_argument("-k", type=int, default=1024)
 
     parser.add_argument("-t", "--train", type=int, dest="train", default=1)
     parser.add_argument("-l", "--log", type=int, dest="log", default=1)
