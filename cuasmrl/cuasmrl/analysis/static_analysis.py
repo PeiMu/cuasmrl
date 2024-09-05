@@ -5,12 +5,13 @@ logger = get_logger(__name__)
 
 
 def static_analysis(
-        kernel_section,
-        engine,
-        ban_ops,
-        memory_ops,
-        min_st_analysis,  # out
-        black_list,  # out
+    kernel_section,
+    engine,
+    ban_ops,
+    memory_ops,
+    min_st_analysis,  # out
+    black_list,  # out
+    st_db,
 ):
     # pre-scan to obtain assembly file stats
     debug = False
@@ -28,7 +29,8 @@ def static_analysis(
 
     # analysis-only
     num_mem_inst = 0
-    num_infer = 0
+    num_infer_only = 0
+    num_in_db = 0
     # analysis-only
 
     for i, line in enumerate(kernel_section):
@@ -75,7 +77,7 @@ def static_analysis(
                     break
             if is_mem:
                 num_mem_inst += 1
-                resolved = find_def_use(
+                resolved, tmp_opcode = find_def_use(
                     kernel_section,
                     engine,
                     min_st_analysis,
@@ -85,7 +87,10 @@ def static_analysis(
                     debug,
                 )
             if is_mem and resolved:
-                num_infer += 1
+                if tmp_opcode is not None and tmp_opcode in st_db:
+                    num_in_db += 1
+                else:
+                    num_infer_only += 1
             # XXX a hack for blacklist
             if is_mem and not resolved:
                 black_list.add(line)
@@ -108,7 +113,8 @@ def static_analysis(
     for k, v in min_st_analysis.items():
         logger.info(f'{k} -> {v}')
     logger.info(
-        f'num_black_list={len(black_list)}; {num_infer=}; {num_mem_inst=}')
+        f'num_black_list={len(black_list)}; {num_infer_only=}; {num_in_db=}; {num_mem_inst=}'
+    )
     print()
 
     # dimension of the optimization problem
@@ -127,6 +133,7 @@ def find_def_use(
 ):
 
     resolved = False
+    tmp_opcode = None
 
     for src_loc in src:
         if src_loc.startswith('UR'):
@@ -148,7 +155,6 @@ def find_def_use(
                 logger.warning(f'reach a label before resolving users; {line}')
 
                 # FIXME should break? just skip?
-                # all_resolved = False
                 break
 
             *_, stall_count = engine.decode_ctrl_code(tmp_ctrl)
@@ -180,4 +186,4 @@ def find_def_use(
     if not resolved:
         logger.warning(f'cannot resolve stall count {line} for {src}')
 
-    return resolved
+    return resolved, tmp_opcode

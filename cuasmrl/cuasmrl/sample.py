@@ -79,6 +79,7 @@ class Sample:
             MEMORY_OPS,
             MIN_ST_ANALYSIS,
             BLACK_LIST,
+            ST_DB,
         )
         # update via DB
         for k, v in MIN_ST_ANALYSIS.items():
