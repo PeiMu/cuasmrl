@@ -133,7 +133,7 @@ def find_def_use(
 ):
 
     resolved = False
-    tmp_opcode = None
+    resolved_opcode = None
 
     for src_loc in src:
         if src_loc.startswith('UR'):
@@ -174,6 +174,7 @@ def find_def_use(
                     min_st_analysis[tmp_opcode] = accum
                 logger.info(f'resolve {tmp_opcode}')
                 resolved = True
+                resolved_opcode = tmp_opcode
                 break
 
             j += 1
@@ -183,7 +184,10 @@ def find_def_use(
                 # all_resolved = False
                 break
                 # raise RuntimeError(f'cannot reolve stall count {line}')
+        if resolved:
+            break
+
     if not resolved:
         logger.warning(f'cannot resolve stall count {line} for {src}')
 
-    return resolved, tmp_opcode
+    return resolved, resolved_opcode
