@@ -95,7 +95,8 @@ def get_st_database(cc):
             'IMNMX': 4,
             'SEL': 4,
             'LEA': 4,
-            'S2R': 19,
+            #'S2R': 19,
+            'IMAD.WIDE': 5,
         }
     else:
         raise RuntimeError(f'unsupported compute capability: {cc}')
