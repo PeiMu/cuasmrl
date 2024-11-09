@@ -19,27 +19,10 @@ The foundations of this project are described in the following MAPL2019 publicat
 
 The [official documentation](https://triton-lang.org) contains installation instructions and tutorials.
 
-# Quick Installation
-
-You can install the latest stable release of Triton from pip:
-
-```bash
-pip install triton
-```
-Binary wheels are available for CPython 3.7-3.11 and PyPy 3.8-3.9.
-
-And the latest nightly release:
-
-```bash
-pip install -U --index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/Triton-Nightly/pypi/simple/ triton-nightly
-```
 
 # Install from source
 
 ```
-git clone https://github.com/openai/triton.git;
-cd triton;
-
 python -m venv .venv --prompt triton;
 source .venv/bin/activate;
 
@@ -56,9 +39,11 @@ CUDA Driver Version: 545.23.08
 ptxas --version: 12.2
 
 
-https://github.com/hgl71964/CuAssembler.git
+git clone https://github.com/hgl71964/CuAssembler.git
 
 export PYTHONPATH={path-to-CuAssembler}:{path-to-CuAssembler/bin}:{path-to-CuAssembler/CuAsm}
+
+pip install -e cuasmrl
 ```
 
 # Building

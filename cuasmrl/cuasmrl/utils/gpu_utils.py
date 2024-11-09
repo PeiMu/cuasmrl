@@ -96,7 +96,9 @@ def get_st_database(cc):
             'SEL': 4,
             'LEA': 4,
             #'S2R': 19,
+
             'IMAD.WIDE': 5,
+            'IMAD.WIDE.U32': 5,
         }
     else:
         raise RuntimeError(f'unsupported compute capability: {cc}')

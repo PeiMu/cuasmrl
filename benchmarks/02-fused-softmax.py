@@ -11,7 +11,7 @@ import triton
 import triton.language as tl
 
 from cuasmrl.jit import jit
-from cuasmrl.autotuner import autotune 
+from cuasmrl.autotuner import autotune
 from cuasmrl.utils.gpu_utils import get_gpu_name
 
 @dataclass
@@ -74,7 +74,7 @@ def parse_args() -> Config:
     parser.add_argument('--bench', default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--tt', default=False, action=argparse.BooleanOptionalAction)
 
-    parser.add_argument("-m", type=int, default=128)
+    parser.add_argument("-m", type=int, default=512)
     parser.add_argument("-n", type=int, default=4096)
     parser.add_argument("--bm", type=int, default=16)
     parser.add_argument("--bn", type=int, default=128)
@@ -117,10 +117,10 @@ GPU = get_gpu_name()
 
 
 @triton.jit
-def tt_kernel(output_ptr, input_ptr, 
-                   input_row_stride, output_row_stride, 
-                   n_rows, n_cols, 
-                   BLOCK_SIZE: tl.constexpr, 
+def tt_kernel(output_ptr, input_ptr,
+                   input_row_stride, output_row_stride,
+                   n_rows, n_cols,
+                   BLOCK_SIZE: tl.constexpr,
                    ):
     # The rows of the softmax are independent, so we parallelize across those
     row_idx = tl.program_id(0)
@@ -168,7 +168,7 @@ def tt_call(x):
 
     # Number of software piepling stages.
     # num_stages = 4 if SIZE_SMEM > 200000 else 2
-    num_stages = 4 
+    num_stages = 4
 
     # Allocate output
     y = torch.empty_like(x)
@@ -198,8 +198,8 @@ def tt_call(x):
     #     n_cols,
     # )
     tt_kernel[(n_rows, )] (
-        y, x, x.stride(0), y.stride(0), 
-        n_rows, n_cols, BLOCK_SIZE=BLOCK_SIZE, 
+        y, x, x.stride(0), y.stride(0),
+        n_rows, n_cols, BLOCK_SIZE=BLOCK_SIZE,
         num_stages=num_stages, num_warps=num_warps,
     )
     return y
@@ -210,16 +210,16 @@ def call(x, load_dir, kernel):
     # The block size of each loop iteration is the smallest power of two greater than the number of columns in `x`
     # BLOCK_SIZE = triton.next_power_of_2(n_cols)
     # num_warps = 8
-    # num_stages = 4 
+    # num_stages = 4
 
     # Allocate output
     y = torch.empty_like(x)
 
     kernel[(n_rows, )] (
-        y, x, x.stride(0), y.stride(0), 
-        n_rows, n_cols, 
-        #BLOCK_SIZE=BLOCK_SIZE, 
-        # num_stages=num_stages, 
+        y, x, x.stride(0), y.stride(0),
+        n_rows, n_cols,
+        #BLOCK_SIZE=BLOCK_SIZE,
+        # num_stages=num_stages,
         load_dir = load_dir,
     )
     return y
@@ -263,14 +263,14 @@ def main():
             triton.Config({'BLOCK_SIZE': BLOCK_SIZE}, num_stages=4, num_warps=8),
         ],
         key=['n_rows', 'n_cols'],
-        drl_config=args,  
+        drl_config=args,
         ret_ptr=0,
     )
     @jit
-    def cuasmrl_kernel(output_ptr, input_ptr, 
-                    input_row_stride, output_row_stride, 
-                    n_rows, n_cols, 
-                    BLOCK_SIZE: tl.constexpr, 
+    def cuasmrl_kernel(output_ptr, input_ptr,
+                    input_row_stride, output_row_stride,
+                    n_rows, n_cols,
+                    BLOCK_SIZE: tl.constexpr,
         ):
         # The rows of the softmax are independent, so we parallelize across those
         row_idx = tl.program_id(0)
@@ -304,7 +304,7 @@ def main():
     # Benchmark
     # ---------
     if not args.bench:
-        return 
+        return
 
     print(f'benchmarking: {M=}; {N=}')
     torch.cuda.synchronize()
@@ -313,17 +313,17 @@ def main():
         triton.testing.Benchmark(
             x_names=['NA'],  # argument names to use as an x-axis for the plot
             #x_vals=[128 * i for i in range(2, 100)],  # different possible values for `x_name`
-            x_vals=[0],  
+            x_vals=[0],
             line_arg='provider',  # argument name whose value corresponds to a different line in the plot
 
-            line_vals=['triton', 'torch', 'cuasmrl'],  
+            line_vals=['triton', 'torch', 'cuasmrl'],
             line_names=[ "Triton", "Torch", 'cuasmrl', ],
             # line_vals=['triton', 'torch', ],
             # line_names=[ "Triton", "Torch", ],
 
-            styles=[('blue', '-'), ('green', '-'), ('red', '-')], 
+            styles=[('blue', '-'), ('green', '-'), ('red', '-')],
             ylabel="GB/s",  # label name for the y-axis
-            plot_name="softmax-performance",  
+            plot_name="softmax-performance",
             #args={'M': 4096},  # values for function arguments not in `x_names` and `y_name`
             args={},
         ))
