@@ -1,0 +1,43 @@
+source ./pre_setting.sh
+ 
+apt-get install clang -y
+apt-get install lld -y
+apt-get install ccache -y
+
+# reinstall cuda version is necessary
+sudo apt-get --purge remove "*cuda*" "*cublas*" "*cufft*" "*cufile*" "*curand*" "*cusolver*" "*cusparse*" "*gds-tools*" "*npp*" "*nvjpeg*" "nsight*"
+# https://developer.nvidia.com/cuda-12-1-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_network
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
+sudo dpkg -i cuda-keyring_1.0-1_all.deb
+sudo apt-get update
+sudo apt-get -y install cuda-12-1
+sudo apt install cuda-toolkit-12-1 # add PATH etc.
+sudo apt install nvidia-gds-12-1
+
+python -m venv .venv --prompt triton
+source .venv/bin/activate
+pip install ninja cmake wheel; # build-time dependencies
+pip install torch==2.1.2 torchvision --index-url https://download.pytorch.org/whl/cu121
+pip install --no-build-isolation -r cuasmrl/requirement.txt
+pip install flash-attn==2.3.3
+ 
+pip uninstall triton -y
+pip install -e python --no-build-isolation
+ 
+ 
+pip install pyelftools tensorboard
+
+ 
+ 
+git clone https://github.com/hgl71964/CuAssembler.git
+ 
+export PYTHONPATH=/mnt/disk/CuAssembler:/mnt/disk/CuAssembler/bin:/mnt/disk/CuAssembler/CuAsm  export PATH=${PATH}:/mn	t/disk/CuAssembler/bin
+export PYTHONPATH=${PYTHONPATH}:/mnt/disk/CuAssembler/
+ 
+# from within bin directory
+ln -s cuasm.py cuasm
+chmod a+x cuasm
+ 
+pip install -e cuasmrl
+ 
+pip install gymnasium
