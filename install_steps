@@ -36,9 +36,8 @@ pip install pyelftools tensorboard
  
 git clone https://github.com/hgl71964/CuAssembler.git
  
-export PYTHONPATH=/workspace/cuasmrl/CuAssembler:/workspace/cuasmrl/CuAssembler/bin:/workspace/cuasmrl/CuAssembler/CuAsm
 export PATH=${PATH}:/workspace/cuasmrl/CuAssembler/bin
-export PYTHONPATH=${PYTHONPATH}:/workspace/cuasmrl/CuAssembler/
+export PYTHONPATH=${PYTHONPATH}:/workspace/cuasmrl/CuAssembler:/workspace/cuasmrl/CuAssembler/bin:/workspace/cuasmrl/CuAssembler/CuAsm
 
 cd /workspace/cuasmrl/CuAssembler/bin
 # from within bin directory
@@ -47,3 +46,8 @@ chmod a+x cuasm
 
 cd ../..
 pip install -e cuasmrl
+
+tmux new -s cuasmrl
+source .venv/bin/activate
+bash ./benchmark/train.sh
+bash ./benchmark/inference.sh
