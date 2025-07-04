@@ -15,6 +15,10 @@ sudo apt-get -y install cuda-12-1
 sudo apt install cuda-toolkit-12-1 # add PATH etc.
 sudo apt install nvidia-gds-12-1
 
+# or use the image: dstackai/base:py3.11-0.4-cuda-12.1-devel
+# and soft link the pre-built CUDA bin directory
+# ln -s /opt/conda/envs/workflow/bin /usr/local/cuda/bin
+
 python -m venv .venv --prompt triton
 source .venv/bin/activate
 pip install ninja cmake wheel; # build-time dependencies
