@@ -3,6 +3,7 @@ source ./pre_setting.sh
 apt-get install clang -y
 apt-get install lld -y
 apt-get install ccache -y
+apt-get install zlib1g-dev -y
 
 # reinstall cuda version is necessary
 sudo apt-get --purge remove "*cuda*" "*cublas*" "*cufft*" "*cufile*" "*curand*" "*cusolver*" "*cusparse*" "*gds-tools*" "*npp*" "*nvjpeg*" "nsight*"
@@ -31,13 +32,14 @@ pip install pyelftools tensorboard
  
 git clone https://github.com/hgl71964/CuAssembler.git
  
-export PYTHONPATH=/mnt/disk/CuAssembler:/mnt/disk/CuAssembler/bin:/mnt/disk/CuAssembler/CuAsm  export PATH=${PATH}:/mn	t/disk/CuAssembler/bin
-export PYTHONPATH=${PYTHONPATH}:/mnt/disk/CuAssembler/
- 
+export PYTHONPATH=/workspace/cuasmrl/CuAssembler:/workspace/cuasmrl/CuAssembler/bin:/workspace/cuasmrl/CuAssembler/CuAsm
+export PATH=${PATH}:/workspace/cuasmrl/CuAssembler/bin
+export PYTHONPATH=${PYTHONPATH}:/workspace/cuasmrl/CuAssembler/
+
+cd /workspace/cuasmrl/CuAssembler/bin
 # from within bin directory
 ln -s cuasm.py cuasm
 chmod a+x cuasm
- 
+
+cd ../..
 pip install -e cuasmrl
- 
-pip install gymnasium
