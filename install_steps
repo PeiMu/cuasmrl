@@ -49,5 +49,7 @@ pip install -e cuasmrl
 
 tmux new -s cuasmrl
 source .venv/bin/activate
-bash ./benchmark/train.sh
-bash ./benchmark/inference.sh
+rm train.log
+bash ./benchmark/train.sh 2>&1|tee train.log
+rm inference.log
+bash ./benchmark/inference.sh 2>&1|tee inference.log
