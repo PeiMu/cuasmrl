@@ -28,7 +28,7 @@ pip install flash-attn==2.3.3
  
 pip uninstall triton -y
 pip install -e python --no-build-isolation
- 
+export PATH=/workspace/cuasmrl/python/triton/third_party/cuda/bin:${PATH}
  
 pip install pyelftools tensorboard
 pip install nvidia-cutlass==3.5
