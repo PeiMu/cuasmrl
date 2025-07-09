@@ -31,7 +31,7 @@ pip install -e python --no-build-isolation
  
  
 pip install pyelftools tensorboard
-pip install nvidia-cutlass
+pip install nvidia-cutlass==3.5
  
  
 git clone https://github.com/hgl71964/CuAssembler.git
