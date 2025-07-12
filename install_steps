@@ -53,3 +53,7 @@ rm train.log
 bash ./benchmarks/train.sh 2>&1|tee train.log
 rm inference.log
 bash ./benchmarks/inference.sh 2>&1|tee inference.log
+
+
+
+kubectl exec cuasmrljob87tt5-x75z9 -- bash -c "tar czf - -C /workspace/cuasmrl data" | tar xzf - -C .
