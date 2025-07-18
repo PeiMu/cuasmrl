@@ -1,0 +1,59 @@
+source ./pre_setting.sh
+ 
+apt-get install clang -y
+apt-get install lld -y
+apt-get install ccache -y
+apt-get install zlib1g-dev -y
+
+# reinstall cuda version is necessary
+sudo apt-get --purge remove "*cuda*" "*cublas*" "*cufft*" "*cufile*" "*curand*" "*cusolver*" "*cusparse*" "*gds-tools*" "*npp*" "*nvjpeg*" "nsight*"
+# https://developer.nvidia.com/cuda-12-1-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_network
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
+sudo dpkg -i cuda-keyring_1.0-1_all.deb
+sudo apt-get update
+sudo apt-get -y install cuda-12-1
+sudo apt install cuda-toolkit-12-1 # add PATH etc.
+sudo apt install nvidia-gds-12-1
+
+# or use the image: dstackai/base:py3.11-0.4-cuda-12.1-devel
+# and soft link the pre-built CUDA bin directory
+# ln -s /opt/conda/envs/workflow/bin /usr/local/cuda/bin
+
+python -m venv .venv --prompt triton
+source .venv/bin/activate
+pip install ninja cmake wheel; # build-time dependencies
+pip install torch==2.1.2 torchvision --index-url https://download.pytorch.org/whl/cu121
+pip install --no-build-isolation -r cuasmrl/requirement.txt
+pip install flash-attn==2.3.3
+ 
+pip uninstall triton -y
+pip install -e python --no-build-isolation
+export PATH=/workspace/cuasmrl/python/triton/third_party/cuda/bin:${PATH}
+ 
+pip install pyelftools tensorboard
+pip install nvidia-cutlass==3.5
+ 
+ 
+git clone https://github.com/hgl71964/CuAssembler.git
+ 
+export PATH=${PATH}:/workspace/cuasmrl/CuAssembler/bin
+export PYTHONPATH=${PYTHONPATH}:/workspace/cuasmrl/CuAssembler:/workspace/cuasmrl/CuAssembler/bin:/workspace/cuasmrl/CuAssembler/CuAsm
+
+cd /workspace/cuasmrl/CuAssembler/bin
+# from within bin directory
+ln -s cuasm.py cuasm
+chmod a+x cuasm
+
+cd ../..
+pip install -e cuasmrl
+
+tmux new -s cuasmrl
+source .venv/bin/activate
+rm train.log
+bash ./benchmarks/train.sh 2>&1|tee train.log
+rm inference.log
+bash ./benchmarks/inference.sh 2>&1|tee inference.log
+
+
+
+kubectl exec cuasmrljob87tt5-x75z9 -- bash -c "tar czf - -C /workspace/cuasmrl data" | tar xzf - -C .

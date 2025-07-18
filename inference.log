@@ -1,0 +1,490 @@
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/library_defaults.py:40: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cuda module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.driver module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cudart module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.runtime module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.nvrtc module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.nvrtc module instead.
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/backend/operation.py:35: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__, cuda
+[1;32m2025-07-08 12:25:41,697 - INFO - found 4 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:101)[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 131780717201008
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.77it/s]
+[1;32m2025-07-08 12:25:41,777 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:25:41,777 - INFO - run cuasmrl_kernel_0d1d2_3.pkl verified ok; final perf: 48.31; init perf: 45.99; improvement: 5.04% (selection.py:153)[0m
+[1;32m2025-07-08 12:25:41,777 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+matmul-performance-fp16:
+    NA     triton    cuasmrl   cutlass      torch
+0  0.0  11.715933  15.944136  0.274699  38.086755
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/library_defaults.py:40: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cuda module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.driver module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cudart module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.runtime module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.nvrtc module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.nvrtc module instead.
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/backend/operation.py:35: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__, cuda
+[1;32m2025-07-08 12:25:53,702 - INFO - found 4 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:101)[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 139245250722864
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 26.34it/s]
+[1;32m2025-07-08 12:25:53,780 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:25:53,780 - INFO - run cuasmrl_kernel_0d1d2_3.pkl verified ok; final perf: 48.31; init perf: 45.99; improvement: 5.04% (selection.py:153)[0m
+[1;32m2025-07-08 12:25:53,781 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+matmul-performance-fp16:
+    NA     triton    cuasmrl   cutlass      torch
+0  0.0  14.607937  13.746183  0.274005  36.832526
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/library_defaults.py:40: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cuda module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.driver module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cudart module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.runtime module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.nvrtc module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.nvrtc module instead.
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/backend/operation.py:35: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__, cuda
+[1;32m2025-07-08 12:26:05,475 - INFO - found 4 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:101)[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 138847622315024
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 26.31it/s]
+[1;32m2025-07-08 12:26:05,553 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:05,553 - INFO - run cuasmrl_kernel_0d1d2_3.pkl verified ok; final perf: 48.31; init perf: 45.99; improvement: 5.04% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:05,553 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+matmul-performance-fp16:
+    NA     triton    cuasmrl   cutlass      torch
+0  0.0  12.571911  18.798001  0.289947  39.522299
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/library_defaults.py:40: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cuda module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.driver module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cudart module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.runtime module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.nvrtc module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.nvrtc module instead.
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/backend/operation.py:35: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__, cuda
+[1;32m2025-07-08 12:26:17,062 - INFO - found 4 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:101)[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 128526444723216
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.76it/s]
+[1;32m2025-07-08 12:26:17,142 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:17,142 - INFO - run cuasmrl_kernel_0d1d2_3.pkl verified ok; final perf: 48.31; init perf: 45.99; improvement: 5.04% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:17,142 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+matmul-performance-fp16:
+    NA     triton    cuasmrl  cutlass      torch
+0  0.0  10.149556  13.554607  0.28263  38.043573
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/library_defaults.py:40: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cuda module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.driver module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.cudart module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.runtime module instead.
+<frozen importlib._bootstrap_external>:1241: FutureWarning: The cuda.nvrtc module is deprecated and will be removed in a future release, please switch to use the cuda.bindings.nvrtc module instead.
+/workspace/cuasmrl/.venv/lib/python3.11/site-packages/cutlass/backend/operation.py:35: FutureWarning: accessing cuda.__version__ is deprecated, please switch to use cuda.bindings.__version__ instead
+  from cuda import __version__, cuda
+[1;32m2025-07-08 12:26:28,679 - INFO - found 4 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:101)[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 133462765059088
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.62it/s]
+[1;32m2025-07-08 12:26:28,759 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:28,759 - INFO - run cuasmrl_kernel_0d1d2_3.pkl verified ok; final perf: 48.31; init perf: 45.99; improvement: 5.04% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:28,759 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+matmul-performance-fp16:
+    NA     triton    cuasmrl   cutlass     torch
+0  0.0  19.972876  19.878217  0.284179  36.79214
+[1;32m2025-07-08 12:26:33,131 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.64it/s]
+[1;32m2025-07-08 12:26:33,211 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:33,212 - INFO - run cuasmrl_0d1d2d3de4de_10.pkl verified ok; final perf: 71.22; init perf: 68.76; improvement: 3.57% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:33,212 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 126570238226704
+softmax-performance:
+    NA     Triton    Torch    cuasmrl
+0  0.0  19.894079  69.0158  27.905596
+[1;32m2025-07-08 12:26:37,856 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.80it/s]
+[1;32m2025-07-08 12:26:37,936 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:37,936 - INFO - run cuasmrl_0d1d2d3de4de_10.pkl verified ok; final perf: 71.22; init perf: 68.76; improvement: 3.57% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:37,936 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 124594332053776
+softmax-performance:
+    NA     Triton      Torch    cuasmrl
+0  0.0  29.364624  68.301158  28.908242
+[1;32m2025-07-08 12:26:42,395 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.51it/s]
+[1;32m2025-07-08 12:26:42,476 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:42,476 - INFO - run cuasmrl_0d1d2d3de4de_10.pkl verified ok; final perf: 71.22; init perf: 68.76; improvement: 3.57% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:42,476 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 127110402732272
+softmax-performance:
+    NA     Triton      Torch    cuasmrl
+0  0.0  30.541436  69.340312  29.007794
+[1;32m2025-07-08 12:26:47,133 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.70it/s]
+[1;32m2025-07-08 12:26:47,214 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:47,214 - INFO - run cuasmrl_0d1d2d3de4de_10.pkl verified ok; final perf: 71.22; init perf: 68.76; improvement: 3.57% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:47,214 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 134707110375728
+softmax-performance:
+    NA     Triton      Torch    cuasmrl
+0  0.0  27.133878  68.499059  23.823577
+[1;32m2025-07-08 12:26:51,840 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 23.44it/s]
+[1;32m2025-07-08 12:26:51,928 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:51,929 - INFO - run cuasmrl_0d1d2d3de4de_10.pkl verified ok; final perf: 71.22; init perf: 68.76; improvement: 3.57% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:51,929 - INFO - verification time: 0.09s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 137994296553744
+softmax-performance:
+    NA     Triton      Torch    cuasmrl
+0  0.0  32.150262  69.442611  20.818681
+[1;32m2025-07-08 12:26:56,664 - INFO - found 9 cubins in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 28.27it/s]
+[1;32m2025-07-08 12:26:56,737 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:26:56,738 - INFO - run cuasmrl_kernel_0d1d2_8.pkl verified ok; final perf: 10.54; init perf: 8.91; improvement: 18.27% (selection.py:153)[0m
+[1;32m2025-07-08 12:26:56,738 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 134768826938640
+[93mJIT compile[0m
+[CompiledKernel] loading 134768452272752
+[93mJIT compile[0m
+[CompiledKernel] loading 134768452272976
+[93mJIT compile[0m
+[CompiledKernel] loading 134768452273072
+[93mJIT compile[0m
+[CompiledKernel] loading 134768826939248
+[93mJIT compile[0m
+[CompiledKernel] loading 134768826939504
+[93mJIT compile[0m
+[CompiledKernel] loading 134768826939632
+[93mJIT compile[0m
+[CompiledKernel] loading 134768826939760
+[93mJIT compile[0m
+[CompiledKernel] loading 134768826940016
+[93mJIT compile[0m
+[CompiledKernel] loading 134768826940144
+matmul-performance-fp16:
+    NA    triton     torch   cuasmrl
+0  0.0  3.568482  3.049294  4.814122
+[1;32m2025-07-08 12:27:03,015 - INFO - found 9 cubins in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 29.74it/s]
+[1;32m2025-07-08 12:27:03,084 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:03,085 - INFO - run cuasmrl_kernel_0d1d2_8.pkl verified ok; final perf: 10.54; init perf: 8.91; improvement: 18.27% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:03,085 - INFO - verification time: 0.07s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 136217780106512
+[93mJIT compile[0m
+[CompiledKernel] loading 136217779847696
+[93mJIT compile[0m
+[CompiledKernel] loading 136217779847920
+[93mJIT compile[0m
+[CompiledKernel] loading 136217779848016
+[93mJIT compile[0m
+[CompiledKernel] loading 136217780107120
+[93mJIT compile[0m
+[CompiledKernel] loading 136217780107376
+[93mJIT compile[0m
+[CompiledKernel] loading 136217780107504
+[93mJIT compile[0m
+[CompiledKernel] loading 136217780107632
+[93mJIT compile[0m
+[CompiledKernel] loading 136217780107888
+[93mJIT compile[0m
+[CompiledKernel] loading 136217780108016
+matmul-performance-fp16:
+    NA    triton     torch   cuasmrl
+0  0.0  5.207889  3.690139  4.933024
+[1;32m2025-07-08 12:27:09,374 - INFO - found 9 cubins in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 30.03it/s]
+[1;32m2025-07-08 12:27:09,443 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:09,444 - INFO - run cuasmrl_kernel_0d1d2_8.pkl verified ok; final perf: 10.54; init perf: 8.91; improvement: 18.27% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:09,444 - INFO - verification time: 0.07s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 130698505925872
+[93mJIT compile[0m
+[CompiledKernel] loading 130698438476304
+[93mJIT compile[0m
+[CompiledKernel] loading 130698438476528
+[93mJIT compile[0m
+[CompiledKernel] loading 130698438476624
+[93mJIT compile[0m
+[CompiledKernel] loading 130698505926480
+[93mJIT compile[0m
+[CompiledKernel] loading 130698505926736
+[93mJIT compile[0m
+[CompiledKernel] loading 130698505926864
+[93mJIT compile[0m
+[CompiledKernel] loading 130698505926992
+[93mJIT compile[0m
+[CompiledKernel] loading 130698505927248
+[93mJIT compile[0m
+[CompiledKernel] loading 130698505927376
+matmul-performance-fp16:
+    NA    triton     torch   cuasmrl
+0  0.0  4.007935  3.255815  4.315128
+[1;32m2025-07-08 12:27:15,766 - INFO - found 9 cubins in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 28.83it/s]
+[1;32m2025-07-08 12:27:15,837 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:15,838 - INFO - run cuasmrl_kernel_0d1d2_8.pkl verified ok; final perf: 10.54; init perf: 8.91; improvement: 18.27% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:15,838 - INFO - verification time: 0.07s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536383792
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536141392
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536141616
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536141712
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536384400
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536384656
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536384784
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536384912
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536385168
+[93mJIT compile[0m
+[CompiledKernel] loading 124330536385296
+matmul-performance-fp16:
+    NA    triton     torch   cuasmrl
+0  0.0  4.924337  3.176601  3.980359
+[1;32m2025-07-08 12:27:22,045 - INFO - found 9 cubins in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 30.46it/s]
+[1;32m2025-07-08 12:27:22,113 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:22,113 - INFO - run cuasmrl_kernel_0d1d2_8.pkl verified ok; final perf: 10.54; init perf: 8.91; improvement: 18.27% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:22,113 - INFO - verification time: 0.07s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892514032
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892304528
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892304752
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892304848
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892514896
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892515152
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892515280
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892515408
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892515664
+[93mJIT compile[0m
+[CompiledKernel] loading 133479892515792
+matmul-performance-fp16:
+    NA    triton    torch  cuasmrl
+0  0.0  5.843684  3.46279  5.30421
+[1;32m2025-07-08 12:27:28,263 - INFO - found 6 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.78it/s]
+[1;32m2025-07-08 12:27:28,343 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:28,343 - INFO - run cuasmrl_kernel_0d1d2_5.pkl verified ok; final perf: 0.99; init perf: 0.97; improvement: 1.76% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:28,343 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 137595312352240
+softmax-performance:
+    NA      Triton       Torch     cuasmrl
+0  0.0  483.128854  633.056133  350.730972
+[1;32m2025-07-08 12:27:32,775 - INFO - found 6 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 24.81it/s]
+[1;32m2025-07-08 12:27:32,858 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:32,858 - INFO - run cuasmrl_kernel_0d1d2_5.pkl verified ok; final perf: 0.99; init perf: 0.97; improvement: 1.76% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:32,858 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 134101092346928
+softmax-performance:
+    NA      Triton       Torch    cuasmrl
+0  0.0  551.515216  648.314169  316.86486
+[1;32m2025-07-08 12:27:37,347 - INFO - found 6 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.56it/s]
+[1;32m2025-07-08 12:27:37,428 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:37,428 - INFO - run cuasmrl_kernel_0d1d2_5.pkl verified ok; final perf: 0.99; init perf: 0.97; improvement: 1.76% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:37,428 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 129486660545552
+softmax-performance:
+    NA      Triton       Torch    cuasmrl
+0  0.0  378.925911  648.322942  351.41908
+[1;32m2025-07-08 12:27:41,816 - INFO - found 6 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 26.18it/s]
+[1;32m2025-07-08 12:27:41,895 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:41,895 - INFO - run cuasmrl_kernel_0d1d2_5.pkl verified ok; final perf: 0.99; init perf: 0.97; improvement: 1.76% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:41,895 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 123159918898192
+softmax-performance:
+    NA      Triton       Torch    cuasmrl
+0  0.0  434.561941  634.758653  303.53057
+[1;32m2025-07-08 12:27:46,245 - INFO - found 6 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.19it/s]
+[1;32m2025-07-08 12:27:46,326 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:46,327 - INFO - run cuasmrl_kernel_0d1d2_5.pkl verified ok; final perf: 0.99; init perf: 0.97; improvement: 1.76% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:46,327 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 134931524594672
+softmax-performance:
+    NA      Triton       Torch     cuasmrl
+0  0.0  249.534969  662.230128  377.111803
+[1;32m2025-07-08 12:27:50,722 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 29.58it/s]
+[1;32m2025-07-08 12:27:50,792 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:50,792 - INFO - run _cuasmrl_0d1d2d3de4d_10.pkl verified ok; final perf: 0.11; init perf: 0.11; improvement: 0.28% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:50,792 - INFO - verification time: 0.07s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 128904895692400
+bmm:
+    NA    cuasmrl    triton      torch
+0  0.0  91.434951  74.74879  66.635483
+[1;32m2025-07-08 12:27:55,228 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 28.62it/s]
+[1;32m2025-07-08 12:27:55,301 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:55,301 - INFO - run _cuasmrl_0d1d2d3de4d_10.pkl verified ok; final perf: 0.11; init perf: 0.11; improvement: 0.28% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:55,302 - INFO - verification time: 0.07s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 126220666945328
+bmm:
+    NA   cuasmrl     triton      torch
+0  0.0  81.80496  72.898778  67.061649
+[1;32m2025-07-08 12:27:59,850 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 27.85it/s]
+[1;32m2025-07-08 12:27:59,925 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:27:59,925 - INFO - run _cuasmrl_0d1d2d3de4d_10.pkl verified ok; final perf: 0.11; init perf: 0.11; improvement: 0.28% (selection.py:153)[0m
+[1;32m2025-07-08 12:27:59,925 - INFO - verification time: 0.08s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 125307970682608
+bmm:
+    NA    cuasmrl     triton      torch
+0  0.0  92.304226  73.265511  67.010225
+[1;32m2025-07-08 12:28:04,473 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 28.58it/s]
+[1;32m2025-07-08 12:28:04,545 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:28:04,545 - INFO - run _cuasmrl_0d1d2d3de4d_10.pkl verified ok; final perf: 0.11; init perf: 0.11; improvement: 0.28% (selection.py:153)[0m
+[1;32m2025-07-08 12:28:04,545 - INFO - verification time: 0.07s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 127727465398096
+bmm:
+    NA    cuasmrl     triton      torch
+0  0.0  92.336739  72.878512  66.933229
+[1;32m2025-07-08 12:28:09,020 - INFO - found 11 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:101)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 28.56it/s]
+[1;32m2025-07-08 12:28:09,092 - INFO - ✅ kernel verified for 2 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:28:09,093 - INFO - run _cuasmrl_0d1d2d3de4d_10.pkl verified ok; final perf: 0.11; init perf: 0.11; improvement: 0.28% (selection.py:153)[0m
+[1;32m2025-07-08 12:28:09,093 - INFO - verification time: 0.07s (selection.py:160)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 127658652663536
+bmm:
+    NA    cuasmrl    triton      torch
+0  0.0  92.532301  73.51206  67.199181
+[1;32m2025-07-08 12:28:13,527 - INFO - found 5 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn/1_4_4096_32_False (selection.py:101)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 101.50it/s]
+[1;32m2025-07-08 12:28:13,628 - INFO - ✅ kernel verified for 10 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:28:13,628 - INFO - run cuasmrl_kernel_0d1d2_4.pkl verified ok; final perf: 78.98; init perf: 78.20; improvement: 1.00% (selection.py:153)[0m
+[1;32m2025-07-08 12:28:13,629 - INFO - verification time: 0.10s (selection.py:160)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 132951153216464
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX       FGK     Triton    Flash-2
+0  4096.0  65.36584  53.420755  67.108595
+[1;32m2025-07-08 12:28:18,637 - INFO - found 5 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn/1_4_4096_32_False (selection.py:101)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 102.40it/s]
+[1;32m2025-07-08 12:28:18,737 - INFO - ✅ kernel verified for 10 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:28:18,738 - INFO - run cuasmrl_kernel_0d1d2_4.pkl verified ok; final perf: 78.98; init perf: 78.20; improvement: 1.00% (selection.py:153)[0m
+[1;32m2025-07-08 12:28:18,738 - INFO - verification time: 0.10s (selection.py:160)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 124152478583376
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX        FGK     Triton    Flash-2
+0  4096.0  54.923093  70.596001  79.408537
+[1;32m2025-07-08 12:28:23,229 - INFO - found 5 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn/1_4_4096_32_False (selection.py:101)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 100.07it/s]
+[1;32m2025-07-08 12:28:23,332 - INFO - ✅ kernel verified for 10 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:28:23,332 - INFO - run cuasmrl_kernel_0d1d2_4.pkl verified ok; final perf: 78.98; init perf: 78.20; improvement: 1.00% (selection.py:153)[0m
+[1;32m2025-07-08 12:28:23,333 - INFO - verification time: 0.10s (selection.py:160)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 124187412941520
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX        FGK     Triton    Flash-2
+0  4096.0  58.373272  69.756421  79.770493
+[1;32m2025-07-08 12:28:27,950 - INFO - found 5 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn/1_4_4096_32_False (selection.py:101)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 99.24it/s]100%|██████████| 10/10 [00:00<00:00, 98.94it/s]
+[1;32m2025-07-08 12:28:28,053 - INFO - ✅ kernel verified for 10 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:28:28,054 - INFO - run cuasmrl_kernel_0d1d2_4.pkl verified ok; final perf: 78.98; init perf: 78.20; improvement: 1.00% (selection.py:153)[0m
+[1;32m2025-07-08 12:28:28,054 - INFO - verification time: 0.10s (selection.py:160)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 133766431492752
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX        FGK     Triton    Flash-2
+0  4096.0  55.027593  63.974795  79.566663
+[1;32m2025-07-08 12:28:32,630 - INFO - found 5 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn/1_4_4096_32_False (selection.py:101)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 101.56it/s]
+[1;32m2025-07-08 12:28:32,731 - INFO - ✅ kernel verified for 10 test samples (verify.py:231)[0m
+[1;32m2025-07-08 12:28:32,732 - INFO - run cuasmrl_kernel_0d1d2_4.pkl verified ok; final perf: 78.98; init perf: 78.20; improvement: 1.00% (selection.py:153)[0m
+[1;32m2025-07-08 12:28:32,732 - INFO - verification time: 0.10s (selection.py:160)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 136507098745552
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX       FGK     Triton    Flash-2
+0  4096.0  60.35921  66.945727  79.372259
