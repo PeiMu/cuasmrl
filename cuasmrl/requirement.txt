@@ -9,7 +9,7 @@ click==8.1.7
 cloudpickle==3.0.0
 cmake==3.28.3
 contourpy==1.2.1
--e git+https://git@github.com/hgl71964/cuasmrl.git@a4b9d0c34e7e171f6207cb17ce4d8d009f61f6ae#egg=cuasmrl&subdirectory=cuasmrl
+-e git+https://github.com/hgl71964/cuasmrl.git@a4b9d0c34e7e171f6207cb17ce4d8d009f61f6ae#egg=cuasmrl&subdirectory=cuasmrl
 cycler==0.12.1
 diskcache==5.6.3
 einops==0.7.0
@@ -91,7 +91,7 @@ tiktoken==0.6.0
 tokenizers==0.19.1
 tqdm==4.66.2
 transformers==4.40.1
--e git+https://git@github.com/hgl71964/cuasmrl.git@a4b9d0c34e7e171f6207cb17ce4d8d009f61f6ae#egg=triton&subdirectory=python
+-e git+https://github.com/hgl71964/cuasmrl.git@a4b9d0c34e7e171f6207cb17ce4d8d009f61f6ae#egg=triton&subdirectory=python
 typing_extensions==4.10.0
 tzdata==2024.1
 urllib3==2.2.1
