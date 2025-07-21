@@ -56,7 +56,7 @@ class Autotuner(TritonAutotuner):
         self.save_dir = os.path.join(drl_config.default_out_path,
                                      drl_config.save_dir)
 
-    def _bench(self, *args, config, **meta):
+    def _bench(self, *args, config, **meta): #用于对每个配置进行性能测试
         # check for conflicts, i.e. meta-parameters both provided
         # as kwargs and by the autotuner
         conflicts = meta.keys() & config.kwargs.keys()
@@ -94,7 +94,7 @@ class Autotuner(TritonAutotuner):
         except OutOfResources:
             return [float("inf"), float("inf"), float("inf")]
 
-    def run(self, *args, **kwargs):
+    def run(self, *args, **kwargs): #核心方法，用来运行所有配置并选出性能最好的一个
         self.nargs = dict(zip(self.arg_names, args))
 
         def get_special_arg(name: str, default=None):
@@ -154,7 +154,7 @@ class Autotuner(TritonAutotuner):
         if config.pre_hook is not None:
             config.pre_hook(full_nargs)
 
-        ret = self.fn.search(
+        ret = self.fn.search( #使用强化学习策略搜索最优的 GPU 汇编调度策略
             *args,
             num_warps=config.num_warps,
             num_stages=config.num_stages,
@@ -276,6 +276,7 @@ class TrionAutotunerWithCache(TritonAutotuner):
         return False
 
     def run(self, *args, **kwargs):
+        print("auto tunner with cache run")
         self.nargs = dict(zip(self.arg_names, args))
 
         if self.cache_config is not None:

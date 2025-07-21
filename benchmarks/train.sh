@@ -1,6 +1,7 @@
 
 #! /bin/bash
-mkdir data
+rm -rf data/
+mkdir data/
 
 python3 benchmarks/03-matrix-multiplication.py
 python3 benchmarks/batch_matmul.py
