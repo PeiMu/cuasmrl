@@ -30,7 +30,7 @@ pip install flash-attn==2.3.3
  
 pip uninstall triton -y
 pip install -e python --no-build-isolation
-export PATH=/workspace/cuasmrl/python/triton/third_party/cuda/bin:${PATH}
+export PATH=$PWD/python/triton/third_party/cuda/bin:${PATH}
  
 pip install pyelftools tensorboard
 pip install nvidia-cutlass==3.5
@@ -38,10 +38,10 @@ pip install nvidia-cutlass==3.5
  
 git clone https://github.com/hgl71964/CuAssembler.git
  
-export PATH=${PATH}:/workspace/cuasmrl/CuAssembler/bin
-export PYTHONPATH=${PYTHONPATH}:/workspace/cuasmrl/CuAssembler:/workspace/cuasmrl/CuAssembler/bin:/workspace/cuasmrl/CuAssembler/CuAsm
+export PATH=${PATH}:$PWD/CuAssembler/bin
+export PYTHONPATH=${PYTHONPATH}:$PWD/CuAssembler:$PWD/CuAssembler/bin:$PWD/CuAssembler/CuAsm
 
-cd /workspace/cuasmrl/CuAssembler/bin
+cd $PWD/CuAssembler/bin
 # from within bin directory
 ln -s cuasm.py cuasm
 chmod a+x cuasm
@@ -58,4 +58,4 @@ bash ./benchmarks/inference.sh 2>&1|tee inference.log
 
 
 
-kubectl exec cuasmrljob87tt5-x75z9 -- bash -c "tar czf - -C /workspace/cuasmrl data" | tar xzf - -C .
+kubectl exec cuasmrljob87tt5-x75z9 -- bash -c "tar czf - -C $PWD data" | tar xzf - -C .
