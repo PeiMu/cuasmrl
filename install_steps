@@ -1,4 +1,4 @@
-git clone git@github.com:PeiMu/cuasmrl.git -b reproduce
+git clone https://github.com/PeiMu/cuasmrl.git -b reproduce
 
 source ./pre_setting.sh
  
