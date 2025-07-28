@@ -289,7 +289,7 @@ def env_loop(env, config):
                 print(f"info status: {info['status']}")
                 print(f"next done: {next_done_np}")
                 # before reset save the best cubin
-                if info['status'] is not Status.TESTFAIL and global_step > 1000:
+                if info['status'] is not Status.TESTFAIL:
                     if 'episode' in info and env.unwrapped.last_perf > best_reward:
                         best_reward = env.unwrapped.last_perf
                         # assemble and save
