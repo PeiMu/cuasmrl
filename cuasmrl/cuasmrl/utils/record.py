@@ -14,6 +14,7 @@ def save_data(
 ) -> str:
     global COUNTER
     data = {}
+    data['sass'] = bin.asm['sass']
     data['cubin'] = bin.asm['cubin']  # binary
     data['final_perf'] = final_perf
     data['init_perf'] = init_perf
