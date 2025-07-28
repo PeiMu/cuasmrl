@@ -512,6 +512,7 @@ class MutationEngine:
 
     def get_init_perf(self):
         mutated_sass = self.sass
+        print(f'mutated_sass:{mutated_sass}')
 
         # buffer IO
         cap = CuAsmParser()
@@ -567,7 +568,9 @@ class MutationEngine:
     def get_perf(self, sample: Sample):
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
         mutated_sass = deepcopy(self.sass)
+        print(f"previous sass:{mutated_sass}")
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
+        print(f"mutated sass:{mutated_sass}")
 
         # buffer IO
         # cap = CuAsmParser()
@@ -579,6 +582,7 @@ class MutationEngine:
             self.cap.parse_from_buffer(mutated_sass)
             cubin = self.cap.dump_cubin()
             self.update_cubin(cubin)
+            print(f"updated cubin in backend:{cubin}")
         except Exception as e:
             print(f'Assemble failed: {e}')
             assemble_ok = False
@@ -627,8 +631,10 @@ class MutationEngine:
 
     def assemble(self, sample: Sample):
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
+        print(f"mutated_kernel in assemble:{mutated_kernel}")
         mutated_sass = deepcopy(self.sass)
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
+        print(f"mutated sass in assemble:{mutated_sass}")
 
         # buffer IO
         cap = CuAsmParser()
@@ -636,7 +642,9 @@ class MutationEngine:
         try:
             cap.parse_from_buffer(mutated_sass)
             cubin = cap.dump_cubin()
+            print(f"cubin in assemble:{cubin}")
             self.update_cubin(cubin)  # in place update
+            print(f"self.cubin after update:{self.cubin}")
         except Exception as e:
             print(f'Assemble failed: {e}')
             assemble_ok = False

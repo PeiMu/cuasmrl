@@ -268,8 +268,8 @@ def env_loop(env, config):
             next_obs = torch.Tensor(next_obs).to(device)
             next_done = torch.Tensor([next_done_np]).to(device)
 
-            # print(action)
-            # print(reward)
+            print(action)
+            print(reward)
 
             # handle error
             if info['status'] == Status.SEGFAULT:
@@ -297,6 +297,7 @@ def env_loop(env, config):
                             env.unwrapped.init_perf,
                             save_path,
                         )
+                        print("fenv.unwrapped.eng.bin is: {env.unwrapped.eng.bin}")
                         logger.info(
                             f'save cubin with {best_reward} at {iteration} to {p}'
                         )

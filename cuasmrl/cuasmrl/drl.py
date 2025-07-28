@@ -52,6 +52,7 @@ def run_drl(
 
         time.sleep(1)
         cf = CubinFile(temp_file.name)
+        print(f"cf in run_drl: {cf}")
 
     if config.train == 1:
         is_inference = False

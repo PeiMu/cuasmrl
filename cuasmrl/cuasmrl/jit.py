@@ -223,6 +223,7 @@ class ASMJITFunction(JITFunction):
             )
             if load_dir is None:
                 bin = fgk_CompiledKernel(so_path, metadata, asm)
+                print(f"bin from fgk_CompiledKernel: {bin}")
                 run_drl(
                     bin,
                     so_path,
@@ -241,6 +242,7 @@ class ASMJITFunction(JITFunction):
                     # others
                     self.drl_config,  # <- init by the autotuner
                 )
+                print(f"bin after run_drl: {bin}")
                 sys.exit(0)  # signal that training is ok
             else:
                 bin = run_selection(
