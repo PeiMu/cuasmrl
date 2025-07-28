@@ -223,7 +223,7 @@ class ASMJITFunction(JITFunction):
             )
             if load_dir is None:
                 bin = fgk_CompiledKernel(so_path, metadata, asm)
-                print(f"bin from fgk_CompiledKernel: {bin}")
+                print(f"[LOG] bin from fgk_CompiledKernel: {bin}")
                 run_drl(
                     bin,
                     so_path,
