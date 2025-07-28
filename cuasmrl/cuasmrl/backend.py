@@ -119,11 +119,12 @@ class Env(gym.Env):
             test_ok = True
             terminated = True
         else:
+            print(f"\naction = {action}")
             index, direction = action // 2, action % 2
-            print(f"index = {index}, direction = {direction}")
-            print(f"before apply: \n{self.sample}")
+            print(f"\nindex = {index}, direction = {direction}")
+            print(f"\nkernel_section before apply: \n{self.sample.kernel_section}")
             self.sample.apply(index, direction)
-            print(f"after apply: \n{self.sample}")
+            print(f"\nkernel_section after apply: \n{self.sample.kernel_section}")
 
             # run and test
             t1 = time.time()
@@ -570,9 +571,9 @@ class MutationEngine:
     def get_perf(self, sample: Sample):
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
         mutated_sass = deepcopy(self.sass)
-        print(f"previous sass:\n{mutated_sass}")
+        print(f"\nprevious sass:\n{mutated_sass}")
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
-        print(f"mutated sass:\n{mutated_sass}")
+        print(f"\nmutated sass:\n{mutated_sass}")
 
         # buffer IO
         # cap = CuAsmParser()
@@ -584,7 +585,6 @@ class MutationEngine:
             self.cap.parse_from_buffer(mutated_sass)
             cubin = self.cap.dump_cubin()
             self.update_cubin(cubin)
-            print(f"updated cubin in backend:{cubin}")
         except Exception as e:
             print(f'Assemble failed: {e}')
             assemble_ok = False

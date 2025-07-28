@@ -268,8 +268,8 @@ def env_loop(env, config):
             next_obs = torch.Tensor(next_obs).to(device)
             next_done = torch.Tensor([next_done_np]).to(device)
 
-            print(action)
-            print(reward)
+            print(f"\naction: {action}")
+            print(f"\nreward: {reward}")
 
             # handle error
             if info['status'] == Status.SEGFAULT:
@@ -283,8 +283,11 @@ def env_loop(env, config):
                 # so bypass the test
                 # hopefully this leads to training and then exit this process
                 torch.backends.cuda.is_built = lambda: False
+                print("segfault in env_loop")
                 break
             elif info['status'] == Status.TESTFAIL or next_done_np:
+                print(f"info status: {info['status']}")
+                print(f"next done: {next_done_np}")
                 # before reset save the best cubin
                 if info['status'] is not Status.TESTFAIL and global_step > 1000:
                     if 'episode' in info and env.unwrapped.last_perf > best_reward:
