@@ -100,7 +100,9 @@ class PPO(nn.Module):
         if action is None:
             action = categorical.sample()
         logprob = categorical.log_prob(action)
+        print(f"logprob:{logprob}")
         entropy = categorical.entropy()
+        print(f"entropy:{entropy}")
 
         # XXX: mask has inter=dependencies; might as well just flatten action space...
         # split_logits = torch.split(logits, self.nvec.tolist(), dim=1)
@@ -232,6 +234,7 @@ def env_loop(env, config):
     next_done = torch.zeros(config.num_env).to(device)
 
     for iteration in range(start_iteration, config.num_iterations + 1):
+        print(f"current iteration: {iteration}")
         # Annealing the rate if instructed to do so.
         if anneal_lr:
             frac = 1.0 - (iteration - 1.0) / config.num_iterations
@@ -239,6 +242,7 @@ def env_loop(env, config):
             optimizer.param_groups[0]["lr"] = lrnow
 
         for step in range(0, config.num_steps):
+            print(f"current step: {step}")
             global_step += config.num_env
             obs[step] = next_obs
             dones[step] = next_done
@@ -270,6 +274,7 @@ def env_loop(env, config):
 
             print(f"\naction: {action}")
             print(f"\nreward: {reward}")
+            print(f"info status: {info['status']}")
 
             # handle error
             if info['status'] == Status.SEGFAULT:
@@ -286,10 +291,10 @@ def env_loop(env, config):
                 print("segfault in env_loop")
                 break
             elif info['status'] == Status.TESTFAIL or next_done_np:
-                print(f"info status: {info['status']}")
                 print(f"next done: {next_done_np}")
                 # before reset save the best cubin
                 if info['status'] is not Status.TESTFAIL:
+                    #
                     if 'episode' in info:
                         print(f"\naction: {action}")
                         print(f"\nThe best_reward = {best_reward}")

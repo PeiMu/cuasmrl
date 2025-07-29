@@ -569,11 +569,13 @@ class MutationEngine:
 
     # @lru_cache(maxsize=1000)
     def get_perf(self, sample: Sample):
+        print(f"\nself.kernel_start_line to get mutated sass: {self.kernel_start_line}")
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
         mutated_sass = deepcopy(self.sass)
         print(f"\nprevious sass:\n{mutated_sass}")
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
         print(f"\nmutated sass:\n{mutated_sass}")
+        print(f"\nstart line: {self.start_line}, end line: {self.end_line}")
 
         # buffer IO
         # cap = CuAsmParser()
