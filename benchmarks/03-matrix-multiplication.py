@@ -37,7 +37,7 @@ class Config:
     ## Env
     env_id: str = 'cuasmenv-v0'
     num_env: int = 1
-    num_iterations: int = 100
+    num_iterations: int = 1000
     minibatch_size: int = 8
     horizon: int = 32
     num_steps: int = 64
