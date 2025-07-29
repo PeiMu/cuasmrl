@@ -122,9 +122,9 @@ class Env(gym.Env):
             print(f"\naction = {action}")
             index, direction = action // 2, action % 2
             print(f"\nindex = {index}, direction = {direction}")
-            print(f"\nkernel_section before apply: \n{self.sample.kernel_section}")
+            # print(f"\nkernel_section before apply: \n{self.sample.kernel_section}")
             self.sample.apply(index, direction)
-            print(f"\nkernel_section after apply: \n{self.sample.kernel_section}")
+            # print(f"\nkernel_section after apply: \n{self.sample.kernel_section}")
 
             # run and test
             t1 = time.time()
@@ -316,6 +316,7 @@ class MutationEngine:
             k_line += 1
             line += 1
 
+        # fixme: here might have a bug where the sass is not updated, perhaps the end_line
         if end_line is None:
             assert sass[line - 1] == kernel_section[
                 k_line - 1], f'{sass[end_line]} vs {kernel_section[k_line-1]}'
@@ -515,6 +516,7 @@ class MutationEngine:
         self.bin.cu_module = None  # force to re-load
 
     def get_init_perf(self):
+        print("doing get_init_perf()")
         mutated_sass = self.sass
 
         # buffer IO
@@ -569,12 +571,13 @@ class MutationEngine:
 
     # @lru_cache(maxsize=1000)
     def get_perf(self, sample: Sample):
+        print(f"doing get_perf()")
         print(f"\nself.kernel_start_line to get mutated sass: {self.kernel_start_line}")
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
         mutated_sass = deepcopy(self.sass)
-        print(f"\nprevious sass:\n{mutated_sass}")
+        # print(f"\nprevious sass:\n{mutated_sass}")
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
-        print(f"\nmutated sass:\n{mutated_sass}")
+        # print(f"\nmutated sass:\n{mutated_sass}")
         print(f"\nstart line: {self.start_line}, end line: {self.end_line}")
 
         # buffer IO
@@ -634,11 +637,12 @@ class MutationEngine:
         raise NotImplementedError()
 
     def assemble(self, sample: Sample):
+        print("doing assemble()")
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
-        print(f"mutated_kernel in assemble:{mutated_kernel}")
+        # print(f"mutated_kernel in assemble:{mutated_kernel}")
         mutated_sass = deepcopy(self.sass)
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
-        print(f"mutated sass in assemble:{mutated_sass}")
+        # print(f"mutated sass in assemble:{mutated_sass}")
 
         # buffer IO
         cap = CuAsmParser()
@@ -646,9 +650,10 @@ class MutationEngine:
         try:
             cap.parse_from_buffer(mutated_sass)
             cubin = cap.dump_cubin()
-            print(f"cubin in assemble:{cubin}")
+            # print(f"cubin in assemble:{cubin}")
             self.update_cubin(cubin)  # in place update
-            print(f"self.cubin after update:{self.bin.asm['cubin']}")
+            print("doing cubin update")
+            # print(f"self.cubin after update:{self.bin.asm['cubin']}")
         except Exception as e:
             print(f'Assemble failed: {e}')
             assemble_ok = False

@@ -267,6 +267,9 @@ def env_loop(env, config):
             # TRY NOT TO MODIFY: execute the game and log data.
             next_obs, reward, terminations, truncations, info = env.step(
                 action.cpu().numpy())
+            print(f"\nterminations: {terminations}")
+            print(f"\ntruncations: {truncations}")
+            print(f"\ninfor: {info}")
             next_done_np: bool = np.logical_or(terminations, truncations)
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs = torch.Tensor(next_obs).to(device)
@@ -274,7 +277,7 @@ def env_loop(env, config):
 
             print(f"\naction: {action}")
             print(f"\nreward: {reward}")
-            print(f"info status: {info['status']}")
+            print(f"\ninfo status: {info['status']}")
 
             # handle error
             if info['status'] == Status.SEGFAULT:
@@ -288,19 +291,18 @@ def env_loop(env, config):
                 # so bypass the test
                 # hopefully this leads to training and then exit this process
                 torch.backends.cuda.is_built = lambda: False
-                print("segfault in env_loop")
+                print("\nsegfault in env_loop")
                 break
             elif info['status'] == Status.TESTFAIL or next_done_np:
-                print(f"next done: {next_done_np}")
+                print(f"\nnext_done_np: {next_done_np}")
                 # before reset save the best cubin
-                if info['status'] is not Status.TESTFAIL:
-                    #
-                    if 'episode' in info:
+                if info['status'] is not Status.TESTFAIL and global_step > 1000:
+                    if 'episode' in info and env.unwrapped.last_perf > best_reward:
                         print(f"\naction: {action}")
                         print(f"\nThe best_reward = {best_reward}")
                         print(f"\nThe last_perf = {env.unwrapped.last_perf}")
                         best_reward = env.unwrapped.last_perf
-                        print("best_reward updated")
+                        print("\nbest_reward updated")
                         # assemble and save
                         env.unwrapped.eng.assemble(env.unwrapped.sample)
                         p = save_data(
@@ -309,7 +311,7 @@ def env_loop(env, config):
                             env.unwrapped.init_perf,
                             save_path,
                         )
-                        print("fenv.unwrapped.eng.bin is: {env.unwrapped.eng.bin}")
+                        # print("fenv.unwrapped.eng.bin is: {env.unwrapped.eng.bin}")
                         logger.info(
                             f'save cubin with {best_reward} at {iteration} to {p}'
                         )
