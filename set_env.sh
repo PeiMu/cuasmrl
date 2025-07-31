@@ -3,7 +3,7 @@
 set -e
 
 echo "[INFO] 当前路径: $PWD"
-if [[ ! -f "requirement.txt" ]]; then
+if [[ ! -d "benchmarks" ]]; then
     echo "[ERROR] 脚本必须在 cuasmrl 根目录下运行。"
     exit 1
 fi
@@ -33,7 +33,7 @@ source .venv/bin/activate
 pip install -U pip
 pip install ninja cmake wheel
 pip install torch==2.1.2 torchvision --index-url https://download.pytorch.org/whl/cu121
-pip install --no-build-isolation -r requirement.txt
+pip install --no-build-isolation -r cuasmrl/requirement.txt
 pip install flash-attn==2.3.3
 pip install pyelftools tensorboard
 pip install nvidia-cutlass==3.5
