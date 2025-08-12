@@ -578,7 +578,7 @@ class MutationEngine:
         # print(f"\nprevious sass:\n{mutated_sass}")
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
         # print(f"\nmutated sass:\n{mutated_sass}")
-        print(f"\nstart line: {self.start_line}, end line: {self.end_line}")
+        #print(f"\nstart line: {self.start_line}, end line: {self.end_line}")
 
         # buffer IO
         # cap = CuAsmParser()
@@ -652,7 +652,7 @@ class MutationEngine:
             cubin = cap.dump_cubin()
             # print(f"cubin in assemble:{cubin}")
             self.update_cubin(cubin)  # in place update
-            print("doing cubin update")
+            #print("doing cubin update")
             # print(f"self.cubin after update:{self.bin.asm['cubin']}")
         except Exception as e:
             print(f'Assemble failed: {e}')

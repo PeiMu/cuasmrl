@@ -23,9 +23,12 @@ logger = get_logger(__name__)
 
 class CategoricalMasked(Categorical):
 
-    def __init__(self, probs=None, logits=None, validate_args=None, masks=[]):
+    def __init__(self, probs=None, logits=None, validate_args=None, masks=[],force_uniform=True):
         self.device = torch.device("cpu")  # XXX hardcore for now
         self.masks = masks
+        if force_uniform and logits is not None:
+            logits = torch.zeros_like(logits)  # 全零logits = 均匀分布
+            
         if len(self.masks) == 0:
             super(CategoricalMasked, self).__init__(probs, logits,
                                                     validate_args)
