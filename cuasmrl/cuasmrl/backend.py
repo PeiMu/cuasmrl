@@ -119,9 +119,9 @@ class Env(gym.Env):
             test_ok = True
             terminated = True
         else:
-            print(f"\naction = {action}")
+            #print(f"\naction = {action}")
             index, direction = action // 2, action % 2
-            print(f"\nindex = {index}, direction = {direction}")
+            #print(f"\nindex = {index}, direction = {direction}")
             # print(f"\nkernel_section before apply: \n{self.sample.kernel_section}")
             self.sample.apply(index, direction)
             # print(f"\nkernel_section after apply: \n{self.sample.kernel_section}")
