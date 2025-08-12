@@ -516,7 +516,7 @@ class MutationEngine:
         self.bin.cu_module = None  # force to re-load
 
     def get_init_perf(self):
-        print("doing get_init_perf()")
+        #print("doing get_init_perf()")
         mutated_sass = self.sass
 
         # buffer IO
@@ -571,8 +571,8 @@ class MutationEngine:
 
     # @lru_cache(maxsize=1000)
     def get_perf(self, sample: Sample):
-        print(f"doing get_perf()")
-        print(f"\nself.kernel_start_line to get mutated sass: {self.kernel_start_line}")
+        #print(f"doing get_perf()")
+        #print(f"\nself.kernel_start_line to get mutated sass: {self.kernel_start_line}")
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
         mutated_sass = deepcopy(self.sass)
         # print(f"\nprevious sass:\n{mutated_sass}")
@@ -637,7 +637,7 @@ class MutationEngine:
         raise NotImplementedError()
 
     def assemble(self, sample: Sample):
-        print("doing assemble()")
+        #print("doing assemble()")
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
         # print(f"mutated_kernel in assemble:{mutated_kernel}")
         mutated_sass = deepcopy(self.sass)
