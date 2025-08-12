@@ -100,9 +100,9 @@ class PPO(nn.Module):
         if action is None:
             action = categorical.sample()
         logprob = categorical.log_prob(action)
-        print(f"logprob:{logprob}")
+        ##print(f"logprob:{logprob}")
         entropy = categorical.entropy()
-        print(f"entropy:{entropy}")
+        ##print(f"entropy:{entropy}")
 
         # XXX: mask has inter=dependencies; might as well just flatten action space...
         # split_logits = torch.split(logits, self.nvec.tolist(), dim=1)
@@ -234,7 +234,7 @@ def env_loop(env, config):
     next_done = torch.zeros(config.num_env).to(device)
 
     for iteration in range(start_iteration, config.num_iterations + 1):
-        print(f"current iteration: {iteration}")
+        ##print(f"current iteration: {iteration}")
         # Annealing the rate if instructed to do so.
         if anneal_lr:
             frac = 1.0 - (iteration - 1.0) / config.num_iterations
@@ -242,7 +242,7 @@ def env_loop(env, config):
             optimizer.param_groups[0]["lr"] = lrnow
 
         for step in range(0, config.num_steps):
-            print(f"current step: {step}")
+            ##print(f"current step: {step}")
             global_step += config.num_env
             obs[step] = next_obs
             dones[step] = next_done
@@ -267,17 +267,17 @@ def env_loop(env, config):
             # TRY NOT TO MODIFY: execute the game and log data.
             next_obs, reward, terminations, truncations, info = env.step(
                 action.cpu().numpy())
-            print(f"\nterminations: {terminations}")
-            print(f"\ntruncations: {truncations}")
-            print(f"\ninfor: {info}")
+            ##print(f"\nterminations: {terminations}")
+            ##print(f"\ntruncations: {truncations}")
+            ##print(f"\ninfor: {info}")
             next_done_np: bool = np.logical_or(terminations, truncations)
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs = torch.Tensor(next_obs).to(device)
             next_done = torch.Tensor([next_done_np]).to(device)
 
-            print(f"\naction: {action}")
-            print(f"\nreward: {reward}")
-            print(f"\ninfo status: {info['status']}")
+            #print(f"\naction: {action}")
+            #print(f"\nreward: {reward}")
+            #print(f"\ninfo status: {info['status']}")
 
             # handle error
             if info['status'] == Status.SEGFAULT:
@@ -291,18 +291,18 @@ def env_loop(env, config):
                 # so bypass the test
                 # hopefully this leads to training and then exit this process
                 torch.backends.cuda.is_built = lambda: False
-                print("\nsegfault in env_loop")
+                #print("\nsegfault in env_loop")
                 break
             elif info['status'] == Status.TESTFAIL or next_done_np:
-                print(f"\nnext_done_np: {next_done_np}")
+                #print(f"\nnext_done_np: {next_done_np}")
                 # before reset save the best cubin
                 if info['status'] is not Status.TESTFAIL and global_step > 1000:
                     if 'episode' in info and env.unwrapped.last_perf > best_reward:
-                        print(f"\naction: {action}")
-                        print(f"\nThe best_reward = {best_reward}")
-                        print(f"\nThe last_perf = {env.unwrapped.last_perf}")
+                        #print(f"\naction: {action}")
+                        #print(f"\nThe best_reward = {best_reward}")
+                        #print(f"\nThe last_perf = {env.unwrapped.last_perf}")
                         best_reward = env.unwrapped.last_perf
-                        print("\nbest_reward updated")
+                        #print("\nbest_reward updated")
                         # assemble and save
                         env.unwrapped.eng.assemble(env.unwrapped.sample)
                         p = save_data(
@@ -311,7 +311,7 @@ def env_loop(env, config):
                             env.unwrapped.init_perf,
                             save_path,
                         )
-                        # print("fenv.unwrapped.eng.bin is: {env.unwrapped.eng.bin}")
+                        # #print("fenv.unwrapped.eng.bin is: {env.unwrapped.eng.bin}")
                         logger.info(
                             f'save cubin with {best_reward} at {iteration} to {p}'
                         )
@@ -446,7 +446,7 @@ def env_loop(env, config):
                               global_step)
             writer.add_scalar("losses/explained_variance", explained_var,
                               global_step)
-            print(f"SPS: {global_step / (time.time() - start_time):.2f}")
+            #print(f"SPS: {global_step / (time.time() - start_time):.2f}")
             writer.add_scalar("charts/SPS",
                               int(global_step / (time.time() - start_time)),
                               global_step)
