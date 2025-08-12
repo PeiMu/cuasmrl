@@ -122,9 +122,9 @@ class Env(gym.Env):
             #print(f"\naction = {action}")
             index, direction = action // 2, action % 2
             #print(f"\nindex = {index}, direction = {direction}")
-            # #print(f"\nkernel_section before apply: \n{self.sample.kernel_section}")
+            # print(f"\nkernel_section before apply: \n{self.sample.kernel_section}")
             self.sample.apply(index, direction)
-            # #print(f"\nkernel_section after apply: \n{self.sample.kernel_section}")
+            # print(f"\nkernel_section after apply: \n{self.sample.kernel_section}")
 
             # run and test
             t1 = time.time()
@@ -217,22 +217,22 @@ class Env(gym.Env):
             if direction == 0:
                 # it was pushed up
                 for i in range(5, 1, -1):
-                    #print(f'{self.sample.kernel_section[lineno-i]}')
+                    print(f'{self.sample.kernel_section[lineno-i]}')
 
                 logger.critical(f'{self.sample.kernel_section[lineno]}')
                 logger.critical(f'{self.sample.kernel_section[lineno-1]}')
 
                 for i in range(1, 5):
-                    #print(f'{self.sample.kernel_section[lineno+i]}')
+                    print(f'{self.sample.kernel_section[lineno+i]}')
             else:
                 for i in range(5, 0, -1):
-                    #print(f'{self.sample.kernel_section[lineno-i]}')
+                    print(f'{self.sample.kernel_section[lineno-i]}')
 
                 logger.critical(f'{self.sample.kernel_section[lineno+1]}')
                 logger.critical(f'{self.sample.kernel_section[lineno]}')
 
                 for i in range(2, 5):
-                    #print(f'{self.sample.kernel_section[lineno+i]}')
+                    print(f'{self.sample.kernel_section[lineno+i]}')
 
         # update
         state, masks = self._build_state()
@@ -446,10 +446,10 @@ class MutationEngine:
                 # 1.4426950216293334961
                 # R0.reuse
                 # if len(tmp.split('.')) > 1:
-                #     #print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
-                #     #print(word)
-                #     #print(tmp)
-                #     #print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+                #     print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+                #     print(word)
+                #     print(tmp)
+                #     print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
                 # XXX
 
                 if tmp.endswith('reuse'):
@@ -527,7 +527,7 @@ class MutationEngine:
             cubin = cap.dump_cubin()
             self.update_cubin(cubin)
         except Exception as e:
-            #print(f'Assemble failed: {e}')
+            print(f'Assemble failed: {e}')
             assemble_ok = False
 
         # BENCH
@@ -554,17 +554,17 @@ class MutationEngine:
                 # ms = do_bench(fn, 100, 100)
             except RuntimeError as run_err:
                 # likely a cuda error
-                #print(f'CUDA? Runtime Err: {run_err}')
+                print(f'CUDA? Runtime Err: {run_err}')
                 ms = -1
             except Exception as e:
-                #print(f'Other error: {e}')
+                print(f'Other error: {e}')
                 raise e
         else:
             ms = -1
 
         if self.total_flops is not None:
             tflops = self.total_flops / ms * 1e-9
-            # #print(f'ms: {ms:.3f}; tflops: {tflops:.3f};')
+            # print(f'ms: {ms:.3f}; tflops: {tflops:.3f};')
             return tflops, cubin
 
         return -ms, None
@@ -575,10 +575,10 @@ class MutationEngine:
         #print(f"\nself.kernel_start_line to get mutated sass: {self.kernel_start_line}")
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
         mutated_sass = deepcopy(self.sass)
-        # #print(f"\nprevious sass:\n{mutated_sass}")
+        # print(f"\nprevious sass:\n{mutated_sass}")
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
-        # #print(f"\nmutated sass:\n{mutated_sass}")
-        #print(f"\nstart line: {self.start_line}, end line: {self.end_line}")
+        # print(f"\nmutated sass:\n{mutated_sass}")
+        print(f"\nstart line: {self.start_line}, end line: {self.end_line}")
 
         # buffer IO
         # cap = CuAsmParser()
@@ -591,7 +591,7 @@ class MutationEngine:
             cubin = self.cap.dump_cubin()
             self.update_cubin(cubin)
         except Exception as e:
-            #print(f'Assemble failed: {e}')
+            print(f'Assemble failed: {e}')
             assemble_ok = False
             cubin = None
 
@@ -630,19 +630,19 @@ class MutationEngine:
 
         if self.total_flops is not None:
             tflops = self.total_flops / ms * 1e-9
-            # #print(f'ms: {ms:.3f}; tflops: {tflops:.3f};')
+            # print(f'ms: {ms:.3f}; tflops: {tflops:.3f};')
             return tflops, cubin
 
-        # #print(f'ms: {ms:.3f};')
+        # print(f'ms: {ms:.3f};')
         raise NotImplementedError()
 
     def assemble(self, sample: Sample):
         #print("doing assemble()")
         mutated_kernel = sample.kernel_section[self.kernel_start_line:]
-        # #print(f"mutated_kernel in assemble:{mutated_kernel}")
+        # print(f"mutated_kernel in assemble:{mutated_kernel}")
         mutated_sass = deepcopy(self.sass)
         mutated_sass[self.start_line:self.end_line + 1] = mutated_kernel
-        # #print(f"mutated sass in assemble:{mutated_sass}")
+        # print(f"mutated sass in assemble:{mutated_sass}")
 
         # buffer IO
         cap = CuAsmParser()
@@ -650,12 +650,12 @@ class MutationEngine:
         try:
             cap.parse_from_buffer(mutated_sass)
             cubin = cap.dump_cubin()
-            # #print(f"cubin in assemble:{cubin}")
+            # print(f"cubin in assemble:{cubin}")
             self.update_cubin(cubin)  # in place update
-            #print("doing cubin update")
-            # #print(f"self.cubin after update:{self.bin.asm['cubin']}")
+            print("doing cubin update")
+            # print(f"self.cubin after update:{self.bin.asm['cubin']}")
         except Exception as e:
-            #print(f'Assemble failed: {e}')
+            print(f'Assemble failed: {e}')
             assemble_ok = False
             raise e
 
@@ -685,17 +685,17 @@ class MutationEngine:
                 # ms = do_bench(fn, 100, 100)
             except RuntimeError as run_err:
                 # likely a cuda error
-                #print(f'CUDA? Runtime Err: {run_err}')
+                print(f'CUDA? Runtime Err: {run_err}')
                 ms = -1
             except Exception as e:
-                #print(f'Other error: {e}')
+                print(f'Other error: {e}')
                 raise e
         else:
             ms = -1
 
         if self.total_flops is not None:
             tflops = self.total_flops / ms * 1e-9
-            # #print(f'ms: {ms:.3f}; tflops: {tflops:.3f};')
+            # print(f'ms: {ms:.3f}; tflops: {tflops:.3f};')
             return tflops
 
         return -ms
