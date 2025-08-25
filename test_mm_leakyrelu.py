@@ -16,8 +16,6 @@ from cuasmrl.utils.gpu_utils import get_gpu_name
 
 from cuasmrl.autotuner import triton_autotune_with_cache
 
-import cutlass
-
 
 # yapf: disable
 @dataclass
@@ -133,8 +131,6 @@ def matmul(a, b, c, kernel, M, N, K, grid, load, activation=""):
         b.stride(0), b.stride(1),  #
         c.stride(0), c.stride(1),  #
         ACTIVATION=activation,  #
-
-        #
         load_dir=load,
     )
     return c
@@ -165,10 +161,6 @@ def main():
             triton.Config({'BLOCK_SIZE_M': 128, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8},
                           num_stages=4, num_warps=4),
             triton.Config({'BLOCK_SIZE_M': 64, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=5,
-                          num_warps=2),
-            triton.Config({'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_N': 64, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=5,
-                          num_warps=2),
-            triton.Config({'BLOCK_SIZE_M': 64, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=2,
                           num_warps=2),
         ],
         key=['M', 'N', 'K'],
