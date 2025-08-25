@@ -58,5 +58,5 @@ fi
 cd ../../
 
 # 8. 安装 cuasmrl 为可编辑模式
-pip install -e .
+pip install -e . cuasmrl
 
