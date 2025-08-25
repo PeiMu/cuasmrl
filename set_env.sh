@@ -12,7 +12,6 @@ fi
 source ./pre_setting.sh || true
 
 # 2. 安装系统依赖
-apt-get update
 apt-get install -y clang lld ccache zlib1g-dev
 
 # 3. 链接 CUDA 工具路径（conda 环境）
@@ -35,18 +34,17 @@ pip install ninja cmake wheel
 pip install torch==2.1.2 torchvision --index-url https://download.pytorch.org/whl/cu121
 pip install --no-build-isolation -r cuasmrl/requirement.txt
 pip install flash-attn==2.3.3
+
+# 6. 设置自定义 triton（如启用）
+pip uninstall triton -y
+pip install -e python --no-build-isolation
+export PATH=$PWD/python/triton/third_party/cuda/bin:$PATH
+
 pip install pyelftools tensorboard
 pip install nvidia-cutlass==3.5
 
-# 6. 设置自定义 triton（如启用）
-# pip uninstall triton -y
-# pip install -e python --no-build-isolation
-export PATH=$PWD/python/triton/third_party/cuda/bin:$PATH
-
 # 7. 安装 CuAssembler 到本地子目录
-if [ ! -d "CuAssembler" ]; then
-    git clone https://github.com/hgl71964/CuAssembler.git CuAssembler
-fi
+git clone https://github.com/hgl71964/CuAssembler.git
 
 export PATH=$PATH:$PWD/CuAssembler/bin
 export PYTHONPATH=$PYTHONPATH:$PWD/CuAssembler:$PWD/CuAssembler/bin:$PWD/CuAssembler/CuAsm
@@ -56,6 +54,7 @@ if [ ! -f "cuasm" ]; then
     ln -s cuasm.py cuasm
     chmod a+x cuasm
 fi
+
 cd ../../
 
 # 8. 安装 cuasmrl 为可编辑模式
